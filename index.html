@@ -284,6 +284,41 @@
             min-width: 80px;
         }
         
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .attendance-item {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .attendance-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .attendance-item.present {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .attendance-item.absent {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .attendance-item.selected {
+            border: 2px solid #1e3c72;
+        }
+        
         .faq-section {
             margin-top: 20px;
         }
@@ -466,11 +501,11 @@
             </div>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username" value="admin">
+                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" value="admin123">
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password">
             </div>
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="btn" onclick="login()">Login</button>
@@ -503,17 +538,18 @@
         </div>
         
         <div class="search-bar" id="mainSearchBar" style="display: none;">
-            <input type="text" id="globalSearch" class="form-control" placeholder="Search students by name, email, or phone...">
-            <button class="btn" onclick="searchStudents()">🔍 Search</button>
+            <input type="text" id="globalSearch" class="form-control" placeholder="Search by Student ID, Name, Phone or Email...">
+            <button class="btn" onclick="performSearch()">🔍 Search</button>
             <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
         </div>
         
         <div class="nav-tabs" id="navTabs" style="display: none;">
             <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
             <div class="tab" onclick="switchTab('student')">👨‍🎓 Students</div>
-            <div class="tab" onclick="switchTab('courses')">📚 Courses</div>
-            <div class="tab" onclick="switchTab('certificate')">📜 Certificate</div>
-            <div class="tab" onclick="switchTab('contact')">📞 Contact</div>
+            <div class="tab hidden" onclick="switchTab('attendance')" id="attendanceTab">📝 Attendance</div>
+            <div class="tab hidden" onclick="switchTab('fees')" id="feesTab">💰 Fees</div>
+            <div class="tab hidden" onclick="switchTab('certificate')" id="certificateTab">📜 Certificate</div>
+            <div class="tab" onclick="switchTab('reports')">📈 Reports</div>
         </div>
         
         <div class="content">
@@ -536,9 +572,10 @@
                     <div class="card">
                         <h3>Quick Actions</h3>
                         <button class="btn" onclick="switchTab('student')" id="addStudentBtn">➕ Add New Student</button>
-                        <button class="btn" onclick="switchTab('courses')" id="viewCoursesBtn">📚 View Courses</button>
+                        <button class="btn btn-success" onclick="switchTab('fees')" id="recordFeeBtn">💰 Record Fee Payment</button>
+                        <button class="btn" onclick="switchTab('attendance')" id="markAttendanceBtn">📝 Mark Attendance</button>
                         <button class="btn" onclick="switchTab('certificate')" id="generateCertBtn">📜 Generate Certificate</button>
-                        <button class="btn btn-secondary" onclick="switchTab('contact')">📞 Contact Us</button>
+                        <button class="btn btn-secondary" onclick="loadReports()">📈 View Reports</button>
                     </div>
                     
                     <div class="card">
@@ -573,8 +610,8 @@
                 <div class="message" id="studentMessage"></div>
                 
                 <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students by name, email, or phone...">
-                    <button class="btn" onclick="performStudentSearch()">🔍 Search</button>
+                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students...">
+                    <button class="btn" onclick="searchStudents()">🔍 Search</button>
                     <button class="btn btn-secondary" onclick="clearStudentSearch()">Clear</button>
                 </div>
                 
@@ -637,19 +674,66 @@
                 </div>
             </div>
             
-            <!-- Courses Tab -->
-            <div id="courses" class="tab-content">
-                <h2>📚 Available Courses</h2>
-                <div class="message" id="coursesMessage"></div>
+            <!-- Attendance Tab -->
+            <div id="attendance" class="tab-content">
+                <h2>📝 Attendance Management</h2>
+                <div class="message" id="attendanceMessage"></div>
                 
-                <div class="grid" id="coursesGrid">
-                    <p>Loading courses...</p>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Mark Attendance</h3>
+                        <div class="form-group">
+                            <label>Select Date *</label>
+                            <input type="date" id="attendanceDate" class="form-control" value="">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Search Student</label>
+                            <input type="text" id="attendanceSearch" class="form-control" placeholder="Search student..." onkeyup="filterAttendanceStudents()">
+                        </div>
+                        
+                        <div class="attendance-grid" id="attendanceGrid">
+                            <!-- Students will be loaded here -->
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-success" onclick="saveAttendance()">💾 Save Attendance</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Today's Attendance</h3>
+                        <div class="student-list" id="todayAttendance">
+                            <!-- Today's attendance will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fee Management Tab -->
+            <div id="fees" class="tab-content">
+                <h2>💰 Fee Management</h2>
+                <div class="message" id="feeMessage"></div>
+                
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <input type="text" id="feeSearch" class="form-control" placeholder="Search fees by student name, ID, or receipt number...">
+                    <button class="btn" onclick="searchFees()">🔍 Search Fees</button>
+                    <button class="btn btn-secondary" onclick="clearFeeSearch()">Clear</button>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Fee Records</h3>
+                        <div class="student-list" id="feeRecords">
+                            <p>No fee records found</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
             <!-- Certificate Tab -->
             <div id="certificate" class="tab-content">
-                <h2>📜 Certificate Generator</h2>
+                <h2>📜 Certificate Generation</h2>
                 <div class="message" id="certMessage"></div>
                 
                 <div class="grid">
@@ -701,875 +785,30 @@
                 </div>
             </div>
             
-            <!-- Contact Tab -->
-            <div id="contact" class="tab-content">
-                <h2>📞 Contact Us</h2>
-                <div class="message" id="contactMessage"></div>
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <h2>📈 Reports & Analytics</h2>
                 
                 <div class="grid">
                     <div class="card">
-                        <h3>Send Message</h3>
-                        <form id="contactForm" onsubmit="submitContact(event)">
-                            <div class="form-group">
-                                <label>Your Name *</label>
-                                <input type="text" class="form-control" name="name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" class="form-control" name="email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Phone Number</label>
-                                <input type="tel" class="form-control" name="phone">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Subject</label>
-                                <input type="text" class="form-control" name="subject" value="General Inquiry">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Message *</label>
-                                <textarea class="form-control" name="message" rows="4" required></textarea>
-                            </div>
-                            
-                            <button type="submit" class="btn">Send Message</button>
-                        </form>
+                        <h3>Student Statistics</h3>
+                        <div id="studentStats">
+                            <p>Please login to view reports</p>
+                        </div>
                     </div>
                     
                     <div class="card">
-                        <h3>Contact Information</h3>
-                        <p><strong>Institute Name:</strong> Gospel Grace Education</p>
-                        <p><strong>Email:</strong> gospelgraceeducation@gmail.com</p>
-                        <p><strong>Phone:</strong> +91 8010132586</p>
-                        <p><strong>Founder:</strong> Mr. Amey Lole</p>
-                        <p><strong>Address:</strong> [Your Institute Address Here]</p>
-                        
-                        <h4 style="margin-top: 20px;">Office Hours</h4>
-                        <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                        <p>Saturday: 9:00 AM - 2:00 PM</p>
-                        <p>Sunday: Closed</p>
+                        <h3>Attendance Summary</h3>
+                        <div id="attendanceStats">
+                            <p>Please login to view attendance</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // FIXED: Your Render backend URL
-        const API_BASE = 'https://gospelgraceeduofficalapp-com.onrender.com/api';
-        let currentUser = null;
-        let allStudents = [];
-        
-        // Initialize on page load
-        window.onload = function() {
-            checkAuth();
-            
-            // Initialize certificate preview
-            renderCertificatePreview({
-                studentName: "[STUDENT NAME]",
-                courseName: "[COURSE NAME]",
-                duration: "3 Months",
-                grade: "A (Excellent)",
-                completionDate: new Date().toLocaleDateString(),
-                certId: "CERT-XXXXXXXXXX",
-                issueDate: new Date().toLocaleDateString()
-            });
-            
-            // Load courses (available to everyone)
-            loadCourses();
-        };
-        
-        // Function to render certificate preview
-        function renderCertificatePreview(data) {
-            const certificateHTML = `
-                <!-- Golden Border -->
-                <div style="position: absolute; top: 15mm; left: 15mm; right: 15mm; bottom: 15mm; border: 10mm solid #d4af37; padding: 20mm; background: #fffaf0; height: calc(297mm - 50mm); box-sizing: border-box;">
-                    
-                    <!-- Decorative Corner Elements -->
-                    <div style="position: absolute; top: -5mm; left: -5mm; width: 20mm; height: 20mm; border-top: 3mm solid #8b4513; border-left: 3mm solid #8b4513;"></div>
-                    <div style="position: absolute; top: -5mm; right: -5mm; width: 20mm; height: 20mm; border-top: 3mm solid #8b4513; border-right: 3mm solid #8b4513;"></div>
-                    <div style="position: absolute; bottom: -5mm; left: -5mm; width: 20mm; height: 20mm; border-bottom: 3mm solid #8b4513; border-left: 3mm solid #8b4513;"></div>
-                    <div style="position: absolute; bottom: -5mm; right: -5mm; width: 20mm; height: 20mm; border-bottom: 3mm solid #8b4513; border-right: 3mm solid #8b4513;"></div>
-                    
-                    <!-- Inner Border -->
-                    <div style="position: absolute; top: 5mm; left: 5mm; right: 5mm; bottom: 5mm; border: 1px solid rgba(212, 175, 55, 0.3); pointer-events: none;"></div>
-                    
-                    <!-- Certificate Content -->
-                    <div style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 10mm;">
-                        
-                        <!-- Header Section -->
-                        <div style="text-align: center; margin-bottom: 20mm;">
-                            <div style="margin-bottom: 10mm;">
-                                <h1 style="color: #1e3c72; font-size: 36px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">
-                                    CERTIFICATE
-                                </h1>
-                                <h2 style="color: #1e3c72; font-size: 24px; margin: 5px 0 0 0; font-weight: normal;">
-                                    OF COMPLETION
-                                </h2>
-                            </div>
-                            
-                            <div style="height: 2px; background: linear-gradient(90deg, transparent, #d4af37, transparent); margin: 10mm auto; width: 70%;"></div>
-                            
-                            <p style="color: #666; font-size: 16px; margin-top: 10mm; font-style: italic;">
-                                This Certificate is Awarded to
-                            </p>
-                        </div>
-                        
-                        <!-- Student Name Section -->
-                        <div style="text-align: center; margin: 15mm 0;">
-                            <div style="display: inline-block; padding: 15mm 30mm; background: linear-gradient(to right, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.1)); border-radius: 8px; border: 1.5mm solid #d4af37;">
-                                <h2 style="font-size: 36px; color: #8b4513; margin: 0; font-weight: bold; text-transform: uppercase; line-height: 1.2;" 
-                                    id="previewName">
-                                    ${data.studentName}
-                                </h2>
-                            </div>
-                        </div>
-                        
-                        <!-- Certificate Body -->
-                        <div style="text-align: center; margin: 15mm 0; flex-grow: 1;">
-                            <p style="font-size: 20px; margin: 10mm 0; color: #333; line-height: 1.5;">
-                                for successfully completing the course in
-                            </p>
-                            
-                            <h3 style="font-size: 28px; color: #1e3c72; margin: 15mm 0; font-weight: bold; text-decoration: underline; text-decoration-color: #d4af37;" 
-                                id="previewCourse">
-                                ${data.courseName}
-                            </h3>
-                            
-                            <div style="margin: 20mm auto; padding: 15mm; border: 1.5mm dashed #d4af37; border-radius: 6px; background: rgba(255, 255, 255, 0.8); max-width: 400px;">
-                                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-                                    <div style="text-align: center; margin: 5mm 10mm;">
-                                        <p style="font-size: 14px; margin: 2mm 0; color: #666;"><strong>Duration:</strong></p>
-                                        <p style="font-size: 16px; color: #1e3c72; font-weight: bold;" id="previewDuration">${data.duration}</p>
-                                    </div>
-                                    <div style="text-align: center; margin: 5mm 10mm;">
-                                        <p style="font-size: 14px; margin: 2mm 0; color: #666;"><strong>Grade:</strong></p>
-                                        <p style="font-size: 16px; color: #d4af37; font-weight: bold;" id="previewGrade">${data.grade}</p>
-                                    </div>
-                                    <div style="text-align: center; margin: 5mm 10mm;">
-                                        <p style="font-size: 14px; margin: 2mm 0; color: #666;"><strong>Completed:</strong></p>
-                                        <p style="font-size: 16px; color: #1e3c72; font-weight: bold;" id="previewDate">${data.completionDate}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <p style="font-size: 18px; margin: 20mm 0 15mm 0; color: #333; font-style: italic;">
-                                In recognition of dedication, hard work, and outstanding achievement
-                            </p>
-                            
-                            <p style="font-size: 16px; color: #666; margin-top: 15mm;">
-                                Issued on: <span id="previewIssueDate" style="color: #1e3c72; font-weight: bold;">${data.issueDate}</span>
-                            </p>
-                        </div>
-                        
-                        <!-- Signatures Section -->
-                        <div style="display: flex; justify-content: space-between; margin-top: 20mm; padding-top: 10mm; border-top: 1.5mm solid #d4af37;">
-                            
-                            <!-- Founder Signature -->
-                            <div style="text-align: center; flex: 1;">
-                                <div style="margin-top: 10mm;">
-                                    <div style="height: 40mm; margin-bottom: 5mm;">
-                                        <!-- Signature line -->
-                                        <div style="width: 150mm; height: 1px; background: #333; margin: 0 auto 2mm auto;"></div>
-                                        <div style="width: 150mm; height: 1px; background: #333; margin: 0 auto;"></div>
-                                    </div>
-                                    <strong style="font-size: 16px; color: #1e3c72; display: block;">Mr. Amey Lole</strong>
-                                    <span style="color: #666; font-size: 14px;">FOUNDER & DIRECTOR</span><br>
-                                    <span style="color: #666; font-size: 12px;">Gospel Grace Education</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Institute Seal -->
-                            <div style="text-align: center; flex: 1;">
-                                <div style="position: relative; height: 70mm; margin: 5mm auto 10mm auto;">
-                                    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 70mm; height: 70mm; border: 2mm solid #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white;">
-                                        <div style="text-align: center;">
-                                            <div style="font-size: 12px; color: #666; font-weight: bold;">SEAL</div>
-                                            <div style="font-size: 10px; color: #666;">GOSPEL GRACE</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <strong style="font-size: 16px; color: #1e3c72; display: block;">Authorized Signature</strong>
-                                <span style="color: #666; font-size: 14px;">Institute Stamp</span><br>
-                                <span style="color: #666; font-size: 12px;">Official Verification</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Footer -->
-                        <div style="text-align: center; margin-top: 15mm; color: #666; font-size: 10px; padding-top: 10mm; border-top: 1px solid #ddd;">
-                            <p><strong>Certificate ID:</strong> <span id="previewCertId" style="color: #1e3c72; font-weight: bold;">${data.certId}</span></p>
-                            <p style="margin-top: 2mm; color: #888;">
-                                This certificate is issued electronically and can be verified at Gospel Grace Education
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.getElementById('certificatePreview').innerHTML = certificateHTML;
-        }
-        
-        // Authentication Functions
-        function showLogin() {
-            document.getElementById('loginModal').style.display = 'block';
-        }
-        
-        function hideLogin() {
-            document.getElementById('loginModal').style.display = 'none';
-            document.getElementById('loginMessage').style.display = 'none';
-        }
-        
-        // Login function
-        async function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!username || !password) {
-                showMessage('loginMessage', 'Please enter username and password', 'error');
-                return;
-            }
-            
-            try {
-                showMessage('loginMessage', 'Logging in...', 'info');
-                
-                const response = await fetch(`${API_BASE}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-                
-                const result = await response.json();
-                
-                if(result.success) {
-                    // Store user data in localStorage
-                    localStorage.setItem('currentUser', JSON.stringify(result.user));
-                    localStorage.setItem('isLoggedIn', 'true');
-                    
-                    currentUser = result.user;
-                    document.getElementById('loginSection').style.display = 'none';
-                    document.getElementById('userInfo').style.display = 'block';
-                    document.getElementById('userName').textContent = currentUser.full_name || currentUser.username;
-                    hideLogin();
-                    
-                    // Show UI elements
-                    document.getElementById('navTabs').style.display = 'flex';
-                    document.getElementById('mainSearchBar').style.display = 'flex';
-                    
-                    // Update UI based on role
-                    updateUIForRole(currentUser.role);
-                    
-                    // Load initial data
-                    loadDashboard();
-                    loadStudents();
-                    loadFAQ();
-                    
-                    showMessage('dashboardMessage', `Welcome ${currentUser.full_name}!`, 'success');
-                } else {
-                    showMessage('loginMessage', `Error: ${result.message}`, 'error');
-                }
-            } catch (error) {
-                showMessage('loginMessage', `Error: ${error.message}`, 'error');
-            }
-        }
-        
-        // Logout function
-        async function logout() {
-            try {
-                await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-            
-            // Clear localStorage
-            localStorage.removeItem('currentUser');
-            localStorage.removeItem('isLoggedIn');
-            
-            currentUser = null;
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('userInfo').style.display = 'none';
-            
-            // Hide UI elements
-            document.getElementById('navTabs').style.display = 'none';
-            document.getElementById('mainSearchBar').style.display = 'none';
-            
-            // Clear all data displays
-            document.getElementById('recentStudents').innerHTML = '<p>Please login to view students</p>';
-            document.getElementById('studentList').innerHTML = '<p>Please login to view students</p>';
-            
-            // Show login modal
-            showLogin();
-        }
-        
-        // Check authentication from localStorage
-        function checkAuth() {
-            const isLoggedIn = localStorage.getItem('isLoggedIn');
-            const storedUser = localStorage.getItem('currentUser');
-            
-            if (isLoggedIn === 'true' && storedUser) {
-                currentUser = JSON.parse(storedUser);
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('userInfo').style.display = 'block';
-                document.getElementById('userName').textContent = currentUser.full_name || currentUser.username;
-                
-                // Show UI elements
-                document.getElementById('navTabs').style.display = 'flex';
-                document.getElementById('mainSearchBar').style.display = 'flex';
-                
-                updateUIForRole(currentUser.role);
-                
-                // Load initial data
-                loadDashboard();
-                loadStudents();
-                loadFAQ();
-            } else {
-                // Not logged in, show login modal after 1 second
-                setTimeout(showLogin, 1000);
-            }
-        }
-        
-        function updateUIForRole(role) {
-            const addStudentCard = document.getElementById('addStudentCard');
-            const addStudentBtn = document.getElementById('addStudentBtn');
-            const generateCertBtn = document.getElementById('generateCertBtn');
-            
-            if (role === 'teacher') {
-                // Teachers cannot add students or generate certificates
-                addStudentCard.style.display = 'none';
-                addStudentBtn.style.display = 'none';
-                generateCertBtn.style.display = 'none';
-            } else if (role === 'admin') {
-                // Admins can do everything
-                addStudentCard.style.display = 'block';
-                addStudentBtn.style.display = 'block';
-                generateCertBtn.style.display = 'block';
-            }
-        }
-        
-        // Tab switching
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
-            const tabElement = document.getElementById(tabName);
-            if (tabElement) {
-                tabElement.classList.add('active');
-                
-                // Load data for the tab
-                if(tabName === 'dashboard') {
-                    loadDashboard();
-                } else if(tabName === 'student') {
-                    loadStudents();
-                } else if(tabName === 'courses') {
-                    loadCourses();
-                }
-            }
-            
-            // Update tab navigation
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-                if (tab.textContent.includes(tabName.charAt(0).toUpperCase() + tabName.slice(1))) {
-                    tab.classList.add('active');
-                }
-            });
-        }
-        
-        // Show message
-        function showMessage(elementId, message, type = 'success') {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.className = `message ${type}`;
-            element.style.display = 'block';
-            
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Load dashboard data
-        async function loadDashboard() {
-            if (!currentUser) return;
-            
-            try {
-                if (currentUser.role === 'admin') {
-                    const response = await fetch(`${API_BASE}/admin/dashboard/stats`);
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        // Display admin stats
-                        let statsHtml = '<div class="grid" style="margin-top: 20px;">';
-                        statsHtml += `<div class="card"><h4>Total Students</h4><h2>${result.stats?.students || 0}</h2></div>`;
-                        statsHtml += `<div class="card"><h4>Total Teachers</h4><h2>${result.stats?.teachers || 0}</h2></div>`;
-                        statsHtml += `<div class="card"><h4>Total Courses</h4><h2>${result.stats?.courses || 0}</h2></div>`;
-                        statsHtml += '</div>';
-                        document.getElementById('dashboardMessage').innerHTML = statsHtml;
-                        document.getElementById('dashboardMessage').style.display = 'block';
-                    }
-                }
-                
-                // Load recent students
-                let response;
-                if (currentUser.role === 'admin') {
-                    response = await fetch(`${API_BASE}/admin/students`);
-                } else if (currentUser.role === 'teacher') {
-                    response = await fetch(`${API_BASE}/teacher/students`);
-                }
-                
-                if (response) {
-                    const result = await response.json();
-                    if (result.success) {
-                        const recentStudents = result.students.slice(-5).reverse();
-                        const html = recentStudents.map(student => `
-                            <div class="student-item">
-                                <div>
-                                    <strong>${student.full_name}</strong><br>
-                                    <small>${student.course}</small>
-                                </div>
-                                <div>
-                                    <small>${student.email}</small><br>
-                                    <small>${student.phone}</small>
-                                </div>
-                            </div>
-                        `).join('');
-                        
-                        document.getElementById('recentStudents').innerHTML = html || '<p>No students found</p>';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading dashboard:', error);
-            }
-        }
-        
-        // Load all students
-        async function loadStudents() {
-            if (!currentUser) {
-                document.getElementById('studentList').innerHTML = '<p>Please login to view students</p>';
-                return;
-            }
-            
-            try {
-                let response;
-                if (currentUser.role === 'admin') {
-                    response = await fetch(`${API_BASE}/admin/students`);
-                } else if (currentUser.role === 'teacher') {
-                    response = await fetch(`${API_BASE}/teacher/students`);
-                }
-                
-                if (response) {
-                    const result = await response.json();
-                    if (result.success) {
-                        allStudents = result.students;
-                        displayStudents(allStudents);
-                    } else {
-                        document.getElementById('studentList').innerHTML = '<p>No students found</p>';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading students:', error);
-                showMessage('studentMessage', 'Error loading students', 'error');
-            }
-        }
-        
-        function displayStudents(students) {
-            const html = students.map(student => `
-                <div class="student-item">
-                    <div>
-                        <strong>${student.full_name}</strong><br>
-                        <small>${student.course}</small><br>
-                        <small>${student.email} | ${student.phone}</small>
-                    </div>
-                    <div class="action-buttons">
-                        <button onclick="viewStudentDetails('${student._id}')" class="action-btn btn">
-                            View
-                        </button>
-                        ${currentUser && currentUser.role === 'admin' ? `
-                        <button onclick="deleteStudent('${student._id}')" class="action-btn btn-danger">
-                            Delete
-                        </button>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById('studentList').innerHTML = html || '<p>No students found</p>';
-        }
-        
-        // Add new student
-        async function addStudent(event) {
-            event.preventDefault();
-            
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Only admin can add students');
-                return;
-            }
-            
-            const form = event.target;
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            
-            try {
-                showMessage('studentMessage', 'Adding student...', 'info');
-                
-                const response = await fetch(`${API_BASE}/admin/students/add`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if(result.success) {
-                    showMessage('studentMessage', `Student added successfully! Student ID: ${result.student_id}`, 'success');
-                    form.reset();
-                    loadStudents();
-                    loadDashboard();
-                } else {
-                    showMessage('studentMessage', `Error: ${result.message}`, 'error');
-                }
-            } catch (error) {
-                showMessage('studentMessage', `Error: ${error.message}`, 'error');
-            }
-        }
-        
-        // Delete student
-        async function deleteStudent(studentId) {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Only admin can delete students');
-                return;
-            }
-            
-            if (!confirm('Are you sure you want to delete this student?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/admin/students/${studentId}`, {
-                    method: 'DELETE'
-                });
-                
-                const result = await response.json();
-                
-                if(result.success) {
-                    showMessage('studentMessage', 'Student deleted successfully!', 'success');
-                    loadStudents();
-                    loadDashboard();
-                } else {
-                    showMessage('studentMessage', `Error: ${result.message}`, 'error');
-                }
-            } catch (error) {
-                showMessage('studentMessage', `Error: ${error.message}`, 'error');
-            }
-        }
-        
-        // View student details
-        async function viewStudentDetails(studentId) {
-            try {
-                const response = await fetch(`${API_BASE}/admin/students`);
-                const result = await response.json();
-                if (result.success) {
-                    const student = result.students.find(s => s._id === studentId);
-                    if (student) {
-                        alert(`Student Details:\n\nName: ${student.full_name}\nEmail: ${student.email}\nPhone: ${student.phone}\nCourse: ${student.course}\nAddress: ${student.address || 'N/A'}\nFather: ${student.father_name || 'N/A'}\nMother: ${student.mother_name || 'N/A'}`);
-                    }
-                }
-            } catch (error) {
-                console.error('Error viewing student details:', error);
-            }
-        }
-        
-        // Load courses
-        async function loadCourses() {
-            try {
-                const response = await fetch(`${API_BASE}/courses`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const html = result.courses.map(course => `
-                        <div class="card">
-                            <h3>${course.name}</h3>
-                            <p><strong>Course Code:</strong> ${course.code}</p>
-                            <p><strong>Duration:</strong> ${course.duration}</p>
-                            <p><strong>Fee:</strong> ₹${course.fee}</p>
-                            <p><strong>Description:</strong> ${course.description}</p>
-                            <p><strong>Status:</strong> ${course.status}</p>
-                        </div>
-                    `).join('');
-                    
-                    document.getElementById('coursesGrid').innerHTML = html || '<p>No courses available</p>';
-                } else {
-                    document.getElementById('coursesGrid').innerHTML = '<p>Failed to load courses</p>';
-                }
-            } catch (error) {
-                console.error('Error loading courses:', error);
-                document.getElementById('coursesGrid').innerHTML = '<p>Error loading courses</p>';
-            }
-        }
-        
-        // Generate certificate (client-side only)
-        function generateCertificate(event) {
-            event.preventDefault();
-            
-            const form = event.target;
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            
-            const studentName = document.getElementById('certStudentName').value;
-            
-            if (!studentName) {
-                showMessage('certMessage', 'Please enter student name', 'error');
-                return;
-            }
-            
-            // Generate certificate ID
-            const certId = `CERT-${Date.now().toString().slice(-10)}`;
-            const completionDate = data.completion_date || new Date().toLocaleDateString();
-            const issueDate = new Date().toLocaleDateString();
-            const duration = data.duration || '3 Months';
-            const grade = data.grade + ' (' + (data.grade === 'A' ? 'Excellent' : data.grade === 'B' ? 'Very Good' : 'Good') + ')';
-            
-            // Update preview
-            renderCertificatePreview({
-                studentName: studentName.toUpperCase(),
-                courseName: data.course_name.toUpperCase(),
-                duration: duration,
-                grade: grade,
-                completionDate: completionDate,
-                certId: certId,
-                issueDate: issueDate
-            });
-            
-            showMessage('certMessage', `Certificate generated successfully! Certificate ID: ${certId}`, 'success');
-        }
-        
-        // Print certificate
-        function printCertificate() {
-            const certificateHTML = document.getElementById('certificatePreview').innerHTML;
-            
-            const printContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Certificate - Gospel Grace Education</title>
-                    <style>
-                        @page {
-                            size: A4;
-                            margin: 0;
-                        }
-                        body {
-                            margin: 0;
-                            padding: 0;
-                            width: 210mm;
-                            height: 297mm;
-                            overflow: hidden;
-                            font-family: 'Times New Roman', serif;
-                        }
-                        .certificate-container {
-                            width: 210mm;
-                            height: 297mm;
-                            position: relative;
-                            background: white;
-                        }
-                        * {
-                            box-sizing: border-box;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="certificate-container">
-                        ${certificateHTML}
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(function() {
-                                window.close();
-                            }, 500);
-                        };
-                    <\/script>
-                </body>
-                </html>
-            `;
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(printContent);
-            printWindow.document.close();
-        }
-        
-        // Submit contact form
-        async function submitContact(event) {
-            event.preventDefault();
-            
-            const form = event.target;
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            
-            try {
-                showMessage('contactMessage', 'Sending message...', 'info');
-                
-                const response = await fetch(`${API_BASE}/contact`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if(result.success) {
-                    showMessage('contactMessage', `Thank you for your message! We will contact you soon. Contact ID: ${result.contact_id}`, 'success');
-                    form.reset();
-                } else {
-                    showMessage('contactMessage', `Error: ${result.message}`, 'error');
-                }
-            } catch (error) {
-                showMessage('contactMessage', `Error: ${error.message}`, 'error');
-            }
-        }
-        
-        // Load FAQ
-        function loadFAQ() {
-            const defaultFAQ = [
-                {
-                    question: 'How do I add a new student?',
-                    answer: 'Go to Students tab, fill in all required fields and click Register Student. Only admin can add students.'
-                },
-                {
-                    question: 'How can I search for a student?',
-                    answer: 'Use the search bar at the top of the page or the search box in the Students tab. You can search by Name, Email, or Phone.'
-                },
-                {
-                    question: 'What can teachers do?',
-                    answer: 'Teachers can view student lists and dashboard statistics. Only admin can add/delete students and generate certificates.'
-                },
-                {
-                    question: 'How do I view available courses?',
-                    answer: 'Go to Courses tab to see all available courses with their details including duration and fees.'
-                },
-                {
-                    question: 'How do I contact the institute?',
-                    answer: 'Go to Contact tab to send us a message. You can also email us at gospelgraceeducation@gmail.com or call +91 8010132586.'
-                }
-            ];
-            document.getElementById('faqList').innerHTML = defaultFAQ.map((item, index) => `
-                <div class="faq-item">
-                    <div class="faq-question" onclick="toggleFAQ(${index})">
-                        <span>${item.question}</span>
-                        <span>▼</span>
-                    </div>
-                    <div class="faq-answer" id="faqAnswer${index}">
-                        ${item.answer}
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function toggleFAQ(index) {
-            const answer = document.getElementById(`faqAnswer${index}`);
-            answer.classList.toggle('active');
-        }
-        
-        // Search functions
-        async function searchStudents() {
-            const searchTerm = document.getElementById('globalSearch').value.trim();
-            if (!searchTerm) {
-                alert('Please enter a search term');
-                return;
-            }
-            
-            if (!currentUser) {
-                showLogin();
-                return;
-            }
-            
-            try {
-                let response;
-                if (currentUser.role === 'admin') {
-                    response = await fetch(`${API_BASE}/admin/students`);
-                } else if (currentUser.role === 'teacher') {
-                    response = await fetch(`${API_BASE}/teacher/students`);
-                }
-                
-                if (response) {
-                    const result = await response.json();
-                    if (result.success) {
-                        const filtered = result.students.filter(student => 
-                            student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            student.phone.includes(searchTerm)
-                        );
-                        
-                        if (filtered.length === 0) {
-                            alert('No students found matching your search');
-                            return;
-                        }
-                        
-                        displayStudents(filtered);
-                        switchTab('student');
-                    }
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-                alert('Error performing search');
-            }
-        }
-        
-        function clearSearch() {
-            document.getElementById('globalSearch').value = '';
-            loadStudents();
-        }
-        
-        async function performStudentSearch() {
-            const searchTerm = document.getElementById('studentSearch').value.trim();
-            if (!searchTerm) {
-                loadStudents();
-                return;
-            }
-            
-            if (!currentUser) {
-                showLogin();
-                return;
-            }
-            
-            try {
-                let response;
-                if (currentUser.role === 'admin') {
-                    response = await fetch(`${API_BASE}/admin/students`);
-                } else if (currentUser.role === 'teacher') {
-                    response = await fetch(`${API_BASE}/teacher/students`);
-                }
-                
-                if (response) {
-                    const result = await response.json();
-                    if (result.success) {
-                        const filtered = result.students.filter(student => 
-                            student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            student.phone.includes(searchTerm)
-                        );
-                        
-                        displayStudents(filtered);
-                    }
-                }
-            } catch (error) {
-                console.error('Search error:', error);
-                showMessage('studentMessage', 'Error searching students', 'error');
-            }
-        }
-        
-        function clearStudentSearch() {
-            document.getElementById('studentSearch').value = '';
-            loadStudents();
-        }
-    </script>
+    <!-- Add this line to include your JavaScript file -->
+    <script src="app.js"></script>
 </body>
 </html>
