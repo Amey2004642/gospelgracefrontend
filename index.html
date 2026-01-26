@@ -284,41 +284,6 @@
             min-width: 80px;
         }
         
-        .attendance-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .attendance-item {
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .attendance-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .attendance-item.present {
-            background: #d4edda;
-            border-color: #c3e6cb;
-        }
-        
-        .attendance-item.absent {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-        }
-        
-        .attendance-item.selected {
-            border: 2px solid #1e3c72;
-        }
-        
         .faq-section {
             margin-top: 20px;
         }
@@ -538,18 +503,17 @@
         </div>
         
         <div class="search-bar" id="mainSearchBar" style="display: none;">
-            <input type="text" id="globalSearch" class="form-control" placeholder="Search by Student ID, Name, Phone or Email...">
-            <button class="btn" onclick="performSearch()">🔍 Search</button>
+            <input type="text" id="globalSearch" class="form-control" placeholder="Search students by name, email, or phone...">
+            <button class="btn" onclick="searchStudents()">🔍 Search</button>
             <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
         </div>
         
         <div class="nav-tabs" id="navTabs" style="display: none;">
             <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
             <div class="tab" onclick="switchTab('student')">👨‍🎓 Students</div>
-            <div class="tab hidden" onclick="switchTab('attendance')" id="attendanceTab">📝 Attendance</div>
-            <div class="tab hidden" onclick="switchTab('fees')" id="feesTab">💰 Fees</div>
-            <div class="tab hidden" onclick="switchTab('certificate')" id="certificateTab">📜 Certificate</div>
-            <div class="tab" onclick="switchTab('reports')">📈 Reports</div>
+            <div class="tab" onclick="switchTab('courses')">📚 Courses</div>
+            <div class="tab" onclick="switchTab('certificate')">📜 Certificate</div>
+            <div class="tab" onclick="switchTab('contact')">📞 Contact</div>
         </div>
         
         <div class="content">
@@ -572,10 +536,9 @@
                     <div class="card">
                         <h3>Quick Actions</h3>
                         <button class="btn" onclick="switchTab('student')" id="addStudentBtn">➕ Add New Student</button>
-                        <button class="btn btn-success" onclick="switchTab('fees')" id="recordFeeBtn">💰 Record Fee Payment</button>
-                        <button class="btn" onclick="switchTab('attendance')" id="markAttendanceBtn">📝 Mark Attendance</button>
+                        <button class="btn" onclick="switchTab('courses')" id="viewCoursesBtn">📚 View Courses</button>
                         <button class="btn" onclick="switchTab('certificate')" id="generateCertBtn">📜 Generate Certificate</button>
-                        <button class="btn btn-secondary" onclick="loadReports()">📈 View Reports</button>
+                        <button class="btn btn-secondary" onclick="switchTab('contact')">📞 Contact Us</button>
                     </div>
                     
                     <div class="card">
@@ -610,8 +573,8 @@
                 <div class="message" id="studentMessage"></div>
                 
                 <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students...">
-                    <button class="btn" onclick="searchStudents()">🔍 Search</button>
+                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students by name, email, or phone...">
+                    <button class="btn" onclick="performStudentSearch()">🔍 Search</button>
                     <button class="btn btn-secondary" onclick="clearStudentSearch()">Clear</button>
                 </div>
                 
@@ -674,64 +637,19 @@
                 </div>
             </div>
             
-            <!-- Attendance Tab -->
-            <div id="attendance" class="tab-content">
-                <h2>📝 Attendance Management</h2>
-                <div class="message" id="attendanceMessage"></div>
+            <!-- Courses Tab -->
+            <div id="courses" class="tab-content">
+                <h2>📚 Available Courses</h2>
+                <div class="message" id="coursesMessage"></div>
                 
-                <div class="grid">
-                    <div class="card">
-                        <h3>Mark Attendance</h3>
-                        <div class="form-group">
-                            <label>Select Date *</label>
-                            <input type="date" id="attendanceDate" class="form-control" value="">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Search Student</label>
-                            <input type="text" id="attendanceSearch" class="form-control" placeholder="Search student..." onkeyup="filterAttendanceStudents()">
-                        </div>
-                        
-                        <div class="attendance-grid" id="attendanceGrid">
-                            <!-- Students will be loaded here -->
-                        </div>
-                        
-                        <div style="margin-top: 20px;">
-                            <button class="btn btn-success" onclick="saveAttendance()">💾 Save Attendance</button>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Today's Attendance</h3>
-                        <div class="student-list" id="todayAttendance">
-                            <!-- Today's attendance will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Fee Management Tab -->
-            <div id="fees" class="tab-content">
-                <h2>💰 Fee Management</h2>
-                <div class="message" id="feeMessage"></div>
-                
-                <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="feeSearch" class="form-control" placeholder="Search fees by student name, ID, or receipt number...">
-                    <button class="btn" onclick="searchFees()">🔍 Search Fees</button>
-                    <button class="btn btn-secondary" onclick="clearFeeSearch()">Clear</button>
-                </div>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h3>Fee Records (Demo)</h3>
-                        <p>Fee management will be implemented in the next version.</p>
-                    </div>
+                <div class="grid" id="coursesGrid">
+                    <p>Loading courses...</p>
                 </div>
             </div>
             
             <!-- Certificate Tab -->
             <div id="certificate" class="tab-content">
-                <h2>📜 Certificate Generation</h2>
+                <h2>📜 Certificate Generator</h2>
                 <div class="message" id="certMessage"></div>
                 
                 <div class="grid">
@@ -783,23 +701,56 @@
                 </div>
             </div>
             
-            <!-- Reports Tab -->
-            <div id="reports" class="tab-content">
-                <h2>📈 Reports & Analytics</h2>
+            <!-- Contact Tab -->
+            <div id="contact" class="tab-content">
+                <h2>📞 Contact Us</h2>
+                <div class="message" id="contactMessage"></div>
                 
                 <div class="grid">
                     <div class="card">
-                        <h3>Student Statistics</h3>
-                        <div id="studentStats">
-                            <p>Please login to view reports</p>
-                        </div>
+                        <h3>Send Message</h3>
+                        <form id="contactForm" onsubmit="submitContact(event)">
+                            <div class="form-group">
+                                <label>Your Name *</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" class="form-control" name="phone">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Subject</label>
+                                <input type="text" class="form-control" name="subject" value="General Inquiry">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Message *</label>
+                                <textarea class="form-control" name="message" rows="4" required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn">Send Message</button>
+                        </form>
                     </div>
                     
                     <div class="card">
-                        <h3>Attendance Summary</h3>
-                        <div id="attendanceStats">
-                            <p>Please login to view attendance</p>
-                        </div>
+                        <h3>Contact Information</h3>
+                        <p><strong>Institute Name:</strong> Gospel Grace Education</p>
+                        <p><strong>Email:</strong> gospelgraceeducation@gmail.com</p>
+                        <p><strong>Phone:</strong> +91 8010132586</p>
+                        <p><strong>Founder:</strong> Mr. Amey Lole</p>
+                        <p><strong>Address:</strong> [Your Institute Address Here]</p>
+                        
+                        <h4 style="margin-top: 20px;">Office Hours</h4>
+                        <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+                        <p>Saturday: 9:00 AM - 2:00 PM</p>
+                        <p>Sunday: Closed</p>
                     </div>
                 </div>
             </div>
@@ -811,12 +762,9 @@
         const API_BASE = 'https://gospelgraceeduofficalapp-com.onrender.com/api';
         let currentUser = null;
         let allStudents = [];
-        let attendanceStudents = [];
         
-        // Set default date for attendance
+        // Initialize on page load
         window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('attendanceDate').value = today;
             checkAuth();
             
             // Initialize certificate preview
@@ -829,6 +777,9 @@
                 certId: "CERT-XXXXXXXXXX",
                 issueDate: new Date().toLocaleDateString()
             });
+            
+            // Load courses (available to everyone)
+            loadCourses();
         };
         
         // Function to render certificate preview
@@ -971,7 +922,7 @@
             document.getElementById('loginMessage').style.display = 'none';
         }
         
-        // FIXED: Login using localStorage
+        // Login function
         async function login() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
@@ -1026,7 +977,7 @@
             }
         }
         
-        // FIXED: Logout using localStorage
+        // Logout function
         async function logout() {
             try {
                 await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
@@ -1049,14 +1000,12 @@
             // Clear all data displays
             document.getElementById('recentStudents').innerHTML = '<p>Please login to view students</p>';
             document.getElementById('studentList').innerHTML = '<p>Please login to view students</p>';
-            document.getElementById('studentStats').innerHTML = '<p>Please login to view reports</p>';
-            document.getElementById('attendanceStats').innerHTML = '<p>Please login to view attendance</p>';
             
             // Show login modal
             showLogin();
         }
         
-        // FIXED: Check authentication from localStorage
+        // Check authentication from localStorage
         function checkAuth() {
             const isLoggedIn = localStorage.getItem('isLoggedIn');
             const storedUser = localStorage.getItem('currentUser');
@@ -1078,77 +1027,31 @@
                 loadStudents();
                 loadFAQ();
             } else {
-                // Not logged in, show login modal
+                // Not logged in, show login modal after 1 second
                 setTimeout(showLogin, 1000);
             }
         }
         
         function updateUIForRole(role) {
-            const attendanceTab = document.getElementById('attendanceTab');
-            const feesTab = document.getElementById('feesTab');
-            const certificateTab = document.getElementById('certificateTab');
             const addStudentCard = document.getElementById('addStudentCard');
             const addStudentBtn = document.getElementById('addStudentBtn');
-            const recordFeeBtn = document.getElementById('recordFeeBtn');
-            const markAttendanceBtn = document.getElementById('markAttendanceBtn');
             const generateCertBtn = document.getElementById('generateCertBtn');
             
             if (role === 'teacher') {
-                attendanceTab.classList.remove('hidden');
-                feesTab.classList.add('hidden');
-                certificateTab.classList.add('hidden');
-                
+                // Teachers cannot add students or generate certificates
                 addStudentCard.style.display = 'none';
                 addStudentBtn.style.display = 'none';
-                recordFeeBtn.style.display = 'none';
                 generateCertBtn.style.display = 'none';
-                markAttendanceBtn.style.display = 'block';
             } else if (role === 'admin') {
-                attendanceTab.classList.remove('hidden');
-                feesTab.classList.remove('hidden');
-                certificateTab.classList.remove('hidden');
-                
+                // Admins can do everything
                 addStudentCard.style.display = 'block';
                 addStudentBtn.style.display = 'block';
-                recordFeeBtn.style.display = 'block';
                 generateCertBtn.style.display = 'block';
-                markAttendanceBtn.style.display = 'block';
-            }
-            
-            updateButtonStates();
-        }
-        
-        function updateButtonStates() {
-            if (!currentUser) return;
-            
-            const addStudentBtn = document.getElementById('addStudentBtn');
-            const recordFeeBtn = document.getElementById('recordFeeBtn');
-            const generateCertBtn = document.getElementById('generateCertBtn');
-            
-            if (currentUser.role === 'teacher') {
-                addStudentBtn.disabled = true;
-                recordFeeBtn.disabled = true;
-                generateCertBtn.disabled = true;
-                addStudentBtn.style.opacity = '0.5';
-                recordFeeBtn.style.opacity = '0.5';
-                generateCertBtn.style.opacity = '0.5';
-            } else {
-                addStudentBtn.disabled = false;
-                recordFeeBtn.disabled = false;
-                generateCertBtn.disabled = false;
-                addStudentBtn.style.opacity = '1';
-                recordFeeBtn.style.opacity = '1';
-                generateCertBtn.style.opacity = '1';
             }
         }
         
         // Tab switching
         function switchTab(tabName) {
-            if (!currentUser) {
-                showLogin();
-                return;
-            }
-            
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -1164,10 +1067,8 @@
                     loadDashboard();
                 } else if(tabName === 'student') {
                     loadStudents();
-                } else if(tabName === 'attendance') {
-                    loadAttendanceStudents();
-                } else if(tabName === 'reports') {
-                    loadReports();
+                } else if(tabName === 'courses') {
+                    loadCourses();
                 }
             }
             
@@ -1197,16 +1098,11 @@
             if (!currentUser) return;
             
             try {
-                let response;
                 if (currentUser.role === 'admin') {
-                    response = await fetch(`${API_BASE}/admin/dashboard/stats`);
-                } else if (currentUser.role === 'teacher') {
-                    response = await fetch(`${API_BASE}/teacher/dashboard/stats`);
-                }
-                
-                if (response) {
+                    const response = await fetch(`${API_BASE}/admin/dashboard/stats`);
                     const result = await response.json();
-                    if (result.success && currentUser.role === 'admin') {
+                    
+                    if (result.success) {
                         // Display admin stats
                         let statsHtml = '<div class="grid" style="margin-top: 20px;">';
                         statsHtml += `<div class="card"><h4>Total Students</h4><h2>${result.stats?.students || 0}</h2></div>`;
@@ -1219,12 +1115,17 @@
                 }
                 
                 // Load recent students
+                let response;
                 if (currentUser.role === 'admin') {
-                    const studentsResponse = await fetch(`${API_BASE}/admin/students`);
-                    const studentsResult = await studentsResponse.json();
-                    
-                    if (studentsResult.success) {
-                        const recentStudents = studentsResult.students.slice(-5).reverse();
+                    response = await fetch(`${API_BASE}/admin/students`);
+                } else if (currentUser.role === 'teacher') {
+                    response = await fetch(`${API_BASE}/teacher/students`);
+                }
+                
+                if (response) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const recentStudents = result.students.slice(-5).reverse();
                         const html = recentStudents.map(student => `
                             <div class="student-item">
                                 <div>
@@ -1248,7 +1149,10 @@
         
         // Load all students
         async function loadStudents() {
-            if (!currentUser) return;
+            if (!currentUser) {
+                document.getElementById('studentList').innerHTML = '<p>Please login to view students</p>';
+                return;
+            }
             
             try {
                 let response;
@@ -1263,6 +1167,8 @@
                     if (result.success) {
                         allStudents = result.students;
                         displayStudents(allStudents);
+                    } else {
+                        document.getElementById('studentList').innerHTML = '<p>No students found</p>';
                     }
                 }
             } catch (error) {
@@ -1309,6 +1215,8 @@
             const data = Object.fromEntries(formData.entries());
             
             try {
+                showMessage('studentMessage', 'Adding student...', 'info');
+                
                 const response = await fetch(`${API_BASE}/admin/students/add`, {
                     method: 'POST',
                     headers: {
@@ -1378,14 +1286,37 @@
             }
         }
         
-        // Generate certificate
+        // Load courses
+        async function loadCourses() {
+            try {
+                const response = await fetch(`${API_BASE}/courses`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const html = result.courses.map(course => `
+                        <div class="card">
+                            <h3>${course.name}</h3>
+                            <p><strong>Course Code:</strong> ${course.code}</p>
+                            <p><strong>Duration:</strong> ${course.duration}</p>
+                            <p><strong>Fee:</strong> ₹${course.fee}</p>
+                            <p><strong>Description:</strong> ${course.description}</p>
+                            <p><strong>Status:</strong> ${course.status}</p>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('coursesGrid').innerHTML = html || '<p>No courses available</p>';
+                } else {
+                    document.getElementById('coursesGrid').innerHTML = '<p>Failed to load courses</p>';
+                }
+            } catch (error) {
+                console.error('Error loading courses:', error);
+                document.getElementById('coursesGrid').innerHTML = '<p>Error loading courses</p>';
+            }
+        }
+        
+        // Generate certificate (client-side only)
         function generateCertificate(event) {
             event.preventDefault();
-            
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Only admin can generate certificates');
-                return;
-            }
             
             const form = event.target;
             const formData = new FormData(form);
@@ -1421,11 +1352,6 @@
         
         // Print certificate
         function printCertificate() {
-            if (!currentUser || currentUser.role !== 'admin') {
-                alert('Only admin can print certificates');
-                return;
-            }
-            
             const certificateHTML = document.getElementById('certificatePreview').innerHTML;
             
             const printContent = `
@@ -1478,6 +1404,38 @@
             printWindow.document.close();
         }
         
+        // Submit contact form
+        async function submitContact(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                showMessage('contactMessage', 'Sending message...', 'info');
+                
+                const response = await fetch(`${API_BASE}/contact`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if(result.success) {
+                    showMessage('contactMessage', `Thank you for your message! We will contact you soon. Contact ID: ${result.contact_id}`, 'success');
+                    form.reset();
+                } else {
+                    showMessage('contactMessage', `Error: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('contactMessage', `Error: ${error.message}`, 'error');
+            }
+        }
+        
         // Load FAQ
         function loadFAQ() {
             const defaultFAQ = [
@@ -1491,11 +1449,15 @@
                 },
                 {
                     question: 'What can teachers do?',
-                    answer: 'Teachers can view student lists, mark attendance, and view reports. Only admin can add/delete students and generate certificates.'
+                    answer: 'Teachers can view student lists and dashboard statistics. Only admin can add/delete students and generate certificates.'
                 },
                 {
-                    question: 'How do I generate a certificate?',
-                    answer: 'Go to Certificate tab, enter student details and course information, then click Generate Certificate. You can then print it in A4 format.'
+                    question: 'How do I view available courses?',
+                    answer: 'Go to Courses tab to see all available courses with their details including duration and fees.'
+                },
+                {
+                    question: 'How do I contact the institute?',
+                    answer: 'Go to Contact tab to send us a message. You can also email us at gospelgraceeducation@gmail.com or call +91 8010132586.'
                 }
             ];
             document.getElementById('faqList').innerHTML = defaultFAQ.map((item, index) => `
@@ -1516,48 +1478,18 @@
             answer.classList.toggle('active');
         }
         
-        // Load reports
-        async function loadReports() {
-            if (!currentUser) return;
-            
-            try {
-                let response;
-                if (currentUser.role === 'admin') {
-                    response = await fetch(`${API_BASE}/admin/dashboard/stats`);
-                } else if (currentUser.role === 'teacher') {
-                    response = await fetch(`${API_BASE}/teacher/dashboard/stats`);
-                }
-                
-                if (response) {
-                    const result = await response.json();
-                    if (result.success) {
-                        let statsHtml = '';
-                        if (currentUser.role === 'admin') {
-                            statsHtml = `
-                                <p><strong>Total Students:</strong> ${result.stats?.students || 0}</p>
-                                <p><strong>Total Teachers:</strong> ${result.stats?.teachers || 0}</p>
-                                <p><strong>Total Courses:</strong> ${result.stats?.courses || 0}</p>
-                                <p><strong>Recent Admissions:</strong> ${result.stats?.recentAdmissions || 0}</p>
-                            `;
-                        } else {
-                            statsHtml = `
-                                <p><strong>Assigned Students:</strong> ${result.stats?.assigned_students || 0}</p>
-                                <p><strong>Pending Tasks:</strong> ${result.stats?.pending_tasks || 0}</p>
-                                <p><strong>Completed Sessions:</strong> ${result.stats?.completed_sessions || 0}</p>
-                                <p><strong>Upcoming Classes:</strong> ${result.stats?.upcoming_classes || 0}</p>
-                            `;
-                        }
-                        document.getElementById('studentStats').innerHTML = statsHtml;
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading reports:', error);
+        // Search functions
+        async function searchStudents() {
+            const searchTerm = document.getElementById('globalSearch').value.trim();
+            if (!searchTerm) {
+                alert('Please enter a search term');
+                return;
             }
-        }
-        
-        // Attendance functions
-        async function loadAttendanceStudents() {
-            if (!currentUser) return;
+            
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
             
             try {
                 let response;
@@ -1570,103 +1502,20 @@
                 if (response) {
                     const result = await response.json();
                     if (result.success) {
-                        attendanceStudents = result.students;
-                        renderAttendanceGrid();
+                        const filtered = result.students.filter(student => 
+                            student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            student.phone.includes(searchTerm)
+                        );
+                        
+                        if (filtered.length === 0) {
+                            alert('No students found matching your search');
+                            return;
+                        }
+                        
+                        displayStudents(filtered);
+                        switchTab('student');
                     }
-                }
-            } catch (error) {
-                console.error('Error loading attendance students:', error);
-            }
-        }
-        
-        function renderAttendanceGrid(filter = '') {
-            const filteredStudents = attendanceStudents.filter(student => 
-                student.full_name.toLowerCase().includes(filter.toLowerCase()) ||
-                student.course.toLowerCase().includes(filter.toLowerCase())
-            );
-            
-            const html = filteredStudents.map(student => `
-                <div class="attendance-item" data-student-id="${student._id}" onclick="toggleAttendance(this, '${student._id}')">
-                    <strong>${student.full_name}</strong><br>
-                    <small>${student.course}</small><br>
-                </div>
-            `).join('');
-            
-            document.getElementById('attendanceGrid').innerHTML = html || '<p>No students found</p>';
-        }
-        
-        function filterAttendanceStudents() {
-            const filter = document.getElementById('attendanceSearch').value;
-            renderAttendanceGrid(filter);
-        }
-        
-        function toggleAttendance(element, studentId) {
-            if (!currentUser) return;
-            
-            // Toggle between present and absent
-            if (element.classList.contains('present')) {
-                element.classList.remove('present');
-                element.classList.add('absent');
-                element.innerHTML += `<br><small class="status-absent">Absent</small>`;
-            } else if (element.classList.contains('absent')) {
-                element.classList.remove('absent');
-                element.querySelector('small.status-absent')?.remove();
-            } else {
-                element.classList.add('present');
-                element.innerHTML += `<br><small class="status-present">Present</small>`;
-            }
-        }
-        
-        async function saveAttendance() {
-            if (!currentUser) return;
-            
-            const date = document.getElementById('attendanceDate').value;
-            if (!date) {
-                showMessage('attendanceMessage', 'Please select a date', 'error');
-                return;
-            }
-            
-            const attendanceItems = document.querySelectorAll('.attendance-item.present, .attendance-item.absent');
-            if (attendanceItems.length === 0) {
-                showMessage('attendanceMessage', 'No attendance marked', 'error');
-                return;
-            }
-            
-            showMessage('attendanceMessage', 'Attendance feature coming soon!', 'info');
-        }
-        
-        // Global search
-        async function performSearch() {
-            if (!currentUser) {
-                showLogin();
-                return;
-            }
-            
-            const searchTerm = document.getElementById('globalSearch').value.trim();
-            if (!searchTerm) {
-                alert('Please enter a search term');
-                return;
-            }
-            
-            try {
-                const response = await fetch(`${API_BASE}/admin/students`);
-                const result = await response.json();
-                
-                if (result.success) {
-                    const students = result.students;
-                    const filtered = students.filter(student => 
-                        student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        student.phone.includes(searchTerm)
-                    );
-                    
-                    if (filtered.length === 0) {
-                        alert('No students found matching your search');
-                        return;
-                    }
-                    
-                    displayStudents(filtered);
-                    switchTab('student');
                 }
             } catch (error) {
                 console.error('Search error:', error);
@@ -1679,27 +1528,37 @@
             loadStudents();
         }
         
-        // Student search
-        async function searchStudents() {
+        async function performStudentSearch() {
             const searchTerm = document.getElementById('studentSearch').value.trim();
             if (!searchTerm) {
                 loadStudents();
                 return;
             }
             
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+            
             try {
-                const response = await fetch(`${API_BASE}/admin/students`);
-                const result = await response.json();
+                let response;
+                if (currentUser.role === 'admin') {
+                    response = await fetch(`${API_BASE}/admin/students`);
+                } else if (currentUser.role === 'teacher') {
+                    response = await fetch(`${API_BASE}/teacher/students`);
+                }
                 
-                if (result.success) {
-                    const students = result.students;
-                    const filtered = students.filter(student => 
-                        student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        student.phone.includes(searchTerm)
-                    );
-                    
-                    displayStudents(filtered);
+                if (response) {
+                    const result = await response.json();
+                    if (result.success) {
+                        const filtered = result.students.filter(student => 
+                            student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            student.phone.includes(searchTerm)
+                        );
+                        
+                        displayStudents(filtered);
+                    }
                 }
             } catch (error) {
                 console.error('Search error:', error);
@@ -1710,15 +1569,6 @@
         function clearStudentSearch() {
             document.getElementById('studentSearch').value = '';
             loadStudents();
-        }
-        
-        // Fee search (placeholder)
-        async function searchFees() {
-            showMessage('feeMessage', 'Fee management feature coming soon!', 'info');
-        }
-        
-        function clearFeeSearch() {
-            document.getElementById('feeSearch').value = '';
         }
     </script>
 </body>
