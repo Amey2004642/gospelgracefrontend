@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gospel Grace Education - Institute Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .user-section {
+            position: absolute;
+            right: 30px;
+            top: 30px;
+        }
+        
+        .search-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .search-bar input {
+            flex: 1;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab:hover {
+            background: #e9ecef;
+        }
+        
+        .tab.active {
+            color: #1e3c72;
+            border-bottom: 3px solid #1e3c72;
+            background: white;
+        }
+        
+        .tab.hidden {
+            display: none;
+        }
+        
+        .tab.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #1e3c72;
+            outline: none;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid #dee2e6;
+        }
+        
+        .card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .status-paid {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .status-partial {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .status-present {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .status-absent {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .student-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .student-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .student-item:hover {
+            background: #f8f9fa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            min-width: 80px;
+        }
+        
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .attendance-item {
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .attendance-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .attendance-item.present {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .attendance-item.absent {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        .attendance-item.selected {
+            border: 2px solid #1e3c72;
+        }
+        
+        .faq-section {
+            margin-top: 20px;
+        }
+        
+        .faq-item {
+            margin-bottom: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 15px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-answer {
+            padding: 15px;
+            background: white;
+            display: none;
+        }
+        
+        .faq-answer.active {
+            display: block;
+        }
+        
+        .help-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        /* Certificate Styles for A4 */
+        .certificate-preview {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: auto;
+            max-height: 600px;
+        }
+        
+        .certificate-content {
+            background: white;
+            font-family: 'Times New Roman', serif;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            transform: scale(0.7);
+            transform-origin: top center;
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: none;
+        }
+        
+        .modal-content {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 1001;
+            min-width: 400px;
+            max-width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        
+        .login-required {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .login-required h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+        }
+        
+        /* A4 Print Styles */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .certificate-content, .certificate-content * {
+                visibility: visible;
+            }
+            
+            .certificate-content {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 210mm !important;
+                height: 297mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                transform: none !important;
+                scale: 1 !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Login to Gospel Grace Education</h3>
+                <button class="close-btn" onclick="hideLogin()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username" value="admin">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password" value="admin123">
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" onclick="login()">Login</button>
+                <button class="btn btn-secondary" onclick="hideLogin()">Cancel</button>
+            </div>
+            <div id="loginMessage" class="message" style="margin-top: 15px;"></div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                <p><strong>Test Accounts:</strong></p>
+                <p>Admin: admin / admin123</p>
+                <p>Teacher: teacher / teacher123</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>✝ Gospel Grace Education</h1>
+            <p class="subtitle">Institute Management System - Spoken English & Computer Courses</p>
+            
+            <div class="user-section">
+                <div id="loginSection">
+                    <button class="btn" onclick="showLogin()">Login</button>
+                </div>
+                <div id="userInfo" style="display: none;">
+                    <span id="userName" style="color: white; margin-right: 10px; font-weight: bold;"></span>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="search-bar" id="mainSearchBar" style="display: none;">
+            <input type="text" id="globalSearch" class="form-control" placeholder="Search by Student ID, Name, Phone or Email...">
+            <button class="btn" onclick="performSearch()">🔍 Search</button>
+            <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+        </div>
+        
+        <div class="nav-tabs" id="navTabs" style="display: none;">
+            <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
+            <div class="tab" onclick="switchTab('student')">👨‍🎓 Students</div>
+            <div class="tab hidden" onclick="switchTab('attendance')" id="attendanceTab">📝 Attendance</div>
+            <div class="tab hidden" onclick="switchTab('fees')" id="feesTab">💰 Fees</div>
+            <div class="tab hidden" onclick="switchTab('certificate')" id="certificateTab">📜 Certificate</div>
+            <div class="tab" onclick="switchTab('reports')">📈 Reports</div>
+        </div>
+        
+        <div class="content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <h2>📊 Institute Dashboard</h2>
+                <div class="message" id="dashboardMessage"></div>
+                
+                <div class="help-section">
+                    <h3>❓ Need Help?</h3>
+                    <p>Welcome to Gospel Grace Education Management System. Here are some quick tips:</p>
+                    <ul style="margin: 10px 0 10px 20px;">
+                        <li>Use the search bar to find students quickly</li>
+                        <li>Check the FAQ section below for common questions</li>
+                        <li>Contact support: gospelgraceeducation@gmail.com | +91 8010132586</li>
+                    </ul>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Quick Actions</h3>
+                        <button class="btn" onclick="switchTab('student')" id="addStudentBtn">➕ Add New Student</button>
+                        <button class="btn btn-success" onclick="switchTab('fees')" id="recordFeeBtn">💰 Record Fee Payment</button>
+                        <button class="btn" onclick="switchTab('attendance')" id="markAttendanceBtn">📝 Mark Attendance</button>
+                        <button class="btn" onclick="switchTab('certificate')" id="generateCertBtn">📜 Generate Certificate</button>
+                        <button class="btn btn-secondary" onclick="loadReports()">📈 View Reports</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Institute Info</h3>
+                        <p><strong>Name:</strong> Gospel Grace Education</p>
+                        <p><strong>Courses:</strong> Spoken English, Computer Basics, Advanced Computing, Tuitions from (Pre-primary to 9(SSC/CBSC/ICSC)</p>
+                        <p><strong>FOUNDER:</strong> Mr. Amey Lole</p>
+                        <p><strong>Contact:</strong> gospelgraceeducation@gmail.com | +91 8010132586</p>
+                        <p><strong>Address:</strong> [Your Institute Address Here]</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Recent Students</h3>
+                        <div class="student-list" id="recentStudents">
+                            <p>Please login to view students</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FAQ Section -->
+                <div class="faq-section">
+                    <h3>📋 Frequently Asked Questions</h3>
+                    <div id="faqList">
+                        <!-- FAQ will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Students Tab -->
+            <div id="student" class="tab-content">
+                <h2>👨‍🎓 Student Management</h2>
+                <div class="message" id="studentMessage"></div>
+                
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students...">
+                    <button class="btn" onclick="searchStudents()">🔍 Search</button>
+                    <button class="btn btn-secondary" onclick="clearStudentSearch()">Clear</button>
+                </div>
+                
+                <div class="grid">
+                    <div class="card" id="addStudentCard">
+                        <h3>Register New Student</h3>
+                        <form id="studentForm" onsubmit="addStudent(event)">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" class="form-control" name="full_name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Email *</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Phone Number *</label>
+                                <input type="tel" class="form-control" name="phone" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Course *</label>
+                                <select class="form-control" name="course" required>
+                                    <option value="">Select Course</option>
+                                    <option value="Spoken English">Spoken English</option>
+                                    <option value="Computer Basics">Computer Basics</option>
+                                    <option value="Advanced Computing">Advanced Computing</option>
+                                    <option value="Tuitions (pre-primary)">Tuitions (pre-primary)</option>
+                                    <option value="Tuitions (primary)">Tuitions (primary)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea class="form-control" name="address" rows="2"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Father's Name</label>
+                                <input type="text" class="form-control" name="father_name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Mother's Name</label>
+                                <input type="text" class="form-control" name="mother_name">
+                            </div>
+                            
+                            <button type="submit" class="btn">Register Student</button>
+                        </form>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Student List</h3>
+                        <div class="student-list" id="studentList">
+                            <p>Please login to view students</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Attendance Tab -->
+            <div id="attendance" class="tab-content">
+                <h2>📝 Attendance Management</h2>
+                <div class="message" id="attendanceMessage"></div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Mark Attendance</h3>
+                        <div class="form-group">
+                            <label>Select Date *</label>
+                            <input type="date" id="attendanceDate" class="form-control" value="">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Search Student</label>
+                            <input type="text" id="attendanceSearch" class="form-control" placeholder="Search student..." onkeyup="filterAttendanceStudents()">
+                        </div>
+                        
+                        <div class="attendance-grid" id="attendanceGrid">
+                            <!-- Students will be loaded here -->
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <button class="btn btn-success" onclick="saveAttendance()">💾 Save Attendance</button>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Today's Attendance</h3>
+                        <div class="student-list" id="todayAttendance">
+                            <!-- Today's attendance will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Fee Management Tab -->
+            <div id="fees" class="tab-content">
+                <h2>💰 Fee Management</h2>
+                <div class="message" id="feeMessage"></div>
+                
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <input type="text" id="feeSearch" class="form-control" placeholder="Search fees by student name, ID, or receipt number...">
+                    <button class="btn" onclick="searchFees()">🔍 Search Fees</button>
+                    <button class="btn btn-secondary" onclick="clearFeeSearch()">Clear</button>
+                </div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Fee Records (Demo)</h3>
+                        <p>Fee management will be implemented in the next version.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Certificate Tab -->
+            <div id="certificate" class="tab-content">
+                <h2>📜 Certificate Generation</h2>
+                <div class="message" id="certMessage"></div>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Generate Certificate</h3>
+                        <form id="certificateForm" onsubmit="generateCertificate(event)">
+                            <div class="form-group">
+                                <label>Student Name *</label>
+                                <input type="text" class="form-control" id="certStudentName" placeholder="Enter student name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Course Name *</label>
+                                <input type="text" class="form-control" name="course_name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Duration</label>
+                                <input type="text" class="form-control" name="duration" value="3 Months">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Grade</label>
+                                <select class="form-control" name="grade">
+                                    <option value="A">A (Excellent)</option>
+                                    <option value="B">B (Very Good)</option>
+                                    <option value="C">C (Good)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Completion Date</label>
+                                <input type="date" class="form-control" name="completion_date">
+                            </div>
+                            
+                            <button type="submit" class="btn">Generate Certificate</button>
+                        </form>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Certificate Preview (A4 Size)</h3>
+                        <div class="certificate-preview">
+                            <div class="certificate-content" id="certificatePreview">
+                                <!-- Certificate Content (Will be generated by JavaScript) -->
+                            </div>
+                        </div>
+                        <button class="btn print-btn" onclick="printCertificate()" style="margin-top: 20px; width: 100%;">🖨️ Print Certificate (A4)</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <h2>📈 Reports & Analytics</h2>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3>Student Statistics</h3>
+                        <div id="studentStats">
+                            <p>Please login to view reports</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Attendance Summary</h3>
+                        <div id="attendanceStats">
+                            <p>Please login to view attendance</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FIXED: Your Render backend URL
+        const API_BASE = 'https://gospelgraceeduofficalapp-com.onrender.com/api';
+        let currentUser = null;
+        let allStudents = [];
+        let attendanceStudents = [];
+        
+        // Set default date for attendance
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('attendanceDate').value = today;
+            checkAuth();
+            
+            // Initialize certificate preview
+            renderCertificatePreview({
+                studentName: "[STUDENT NAME]",
+                courseName: "[COURSE NAME]",
+                duration: "3 Months",
+                grade: "A (Excellent)",
+                completionDate: new Date().toLocaleDateString(),
+                certId: "CERT-XXXXXXXXXX",
+                issueDate: new Date().toLocaleDateString()
+            });
+        };
+        
+        // Function to render certificate preview
+        function renderCertificatePreview(data) {
+            const certificateHTML = `
+                <!-- Golden Border -->
+                <div style="position: absolute; top: 15mm; left: 15mm; right: 15mm; bottom: 15mm; border: 10mm solid #d4af37; padding: 20mm; background: #fffaf0; height: calc(297mm - 50mm); box-sizing: border-box;">
+                    
+                    <!-- Decorative Corner Elements -->
+                    <div style="position: absolute; top: -5mm; left: -5mm; width: 20mm; height: 20mm; border-top: 3mm solid #8b4513; border-left: 3mm solid #8b4513;"></div>
+                    <div style="position: absolute; top: -5mm; right: -5mm; width: 20mm; height: 20mm; border-top: 3mm solid #8b4513; border-right: 3mm solid #8b4513;"></div>
+                    <div style="position: absolute; bottom: -5mm; left: -5mm; width: 20mm; height: 20mm; border-bottom: 3mm solid #8b4513; border-left: 3mm solid #8b4513;"></div>
+                    <div style="position: absolute; bottom: -5mm; right: -5mm; width: 20mm; height: 20mm; border-bottom: 3mm solid #8b4513; border-right: 3mm solid #8b4513;"></div>
+                    
+                    <!-- Inner Border -->
+                    <div style="position: absolute; top: 5mm; left: 5mm; right: 5mm; bottom: 5mm; border: 1px solid rgba(212, 175, 55, 0.3); pointer-events: none;"></div>
+                    
+                    <!-- Certificate Content -->
+                    <div style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 10mm;">
+                        
+                        <!-- Header Section -->
+                        <div style="text-align: center; margin-bottom: 20mm;">
+                            <div style="margin-bottom: 10mm;">
+                                <h1 style="color: #1e3c72; font-size: 36px; margin: 0; text-transform: uppercase; letter-spacing: 2px; font-weight: bold;">
+                                    CERTIFICATE
+                                </h1>
+                                <h2 style="color: #1e3c72; font-size: 24px; margin: 5px 0 0 0; font-weight: normal;">
+                                    OF COMPLETION
+                                </h2>
+                            </div>
+                            
+                            <div style="height: 2px; background: linear-gradient(90deg, transparent, #d4af37, transparent); margin: 10mm auto; width: 70%;"></div>
+                            
+                            <p style="color: #666; font-size: 16px; margin-top: 10mm; font-style: italic;">
+                                This Certificate is Awarded to
+                            </p>
+                        </div>
+                        
+                        <!-- Student Name Section -->
+                        <div style="text-align: center; margin: 15mm 0;">
+                            <div style="display: inline-block; padding: 15mm 30mm; background: linear-gradient(to right, rgba(212, 175, 55, 0.1), rgba(255, 215, 0, 0.1)); border-radius: 8px; border: 1.5mm solid #d4af37;">
+                                <h2 style="font-size: 36px; color: #8b4513; margin: 0; font-weight: bold; text-transform: uppercase; line-height: 1.2;" 
+                                    id="previewName">
+                                    ${data.studentName}
+                                </h2>
+                            </div>
+                        </div>
+                        
+                        <!-- Certificate Body -->
+                        <div style="text-align: center; margin: 15mm 0; flex-grow: 1;">
+                            <p style="font-size: 20px; margin: 10mm 0; color: #333; line-height: 1.5;">
+                                for successfully completing the course in
+                            </p>
+                            
+                            <h3 style="font-size: 28px; color: #1e3c72; margin: 15mm 0; font-weight: bold; text-decoration: underline; text-decoration-color: #d4af37;" 
+                                id="previewCourse">
+                                ${data.courseName}
+                            </h3>
+                            
+                            <div style="margin: 20mm auto; padding: 15mm; border: 1.5mm dashed #d4af37; border-radius: 6px; background: rgba(255, 255, 255, 0.8); max-width: 400px;">
+                                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+                                    <div style="text-align: center; margin: 5mm 10mm;">
+                                        <p style="font-size: 14px; margin: 2mm 0; color: #666;"><strong>Duration:</strong></p>
+                                        <p style="font-size: 16px; color: #1e3c72; font-weight: bold;" id="previewDuration">${data.duration}</p>
+                                    </div>
+                                    <div style="text-align: center; margin: 5mm 10mm;">
+                                        <p style="font-size: 14px; margin: 2mm 0; color: #666;"><strong>Grade:</strong></p>
+                                        <p style="font-size: 16px; color: #d4af37; font-weight: bold;" id="previewGrade">${data.grade}</p>
+                                    </div>
+                                    <div style="text-align: center; margin: 5mm 10mm;">
+                                        <p style="font-size: 14px; margin: 2mm 0; color: #666;"><strong>Completed:</strong></p>
+                                        <p style="font-size: 16px; color: #1e3c72; font-weight: bold;" id="previewDate">${data.completionDate}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p style="font-size: 18px; margin: 20mm 0 15mm 0; color: #333; font-style: italic;">
+                                In recognition of dedication, hard work, and outstanding achievement
+                            </p>
+                            
+                            <p style="font-size: 16px; color: #666; margin-top: 15mm;">
+                                Issued on: <span id="previewIssueDate" style="color: #1e3c72; font-weight: bold;">${data.issueDate}</span>
+                            </p>
+                        </div>
+                        
+                        <!-- Signatures Section -->
+                        <div style="display: flex; justify-content: space-between; margin-top: 20mm; padding-top: 10mm; border-top: 1.5mm solid #d4af37;">
+                            
+                            <!-- Founder Signature -->
+                            <div style="text-align: center; flex: 1;">
+                                <div style="margin-top: 10mm;">
+                                    <div style="height: 40mm; margin-bottom: 5mm;">
+                                        <!-- Signature line -->
+                                        <div style="width: 150mm; height: 1px; background: #333; margin: 0 auto 2mm auto;"></div>
+                                        <div style="width: 150mm; height: 1px; background: #333; margin: 0 auto;"></div>
+                                    </div>
+                                    <strong style="font-size: 16px; color: #1e3c72; display: block;">Mr. Amey Lole</strong>
+                                    <span style="color: #666; font-size: 14px;">FOUNDER & DIRECTOR</span><br>
+                                    <span style="color: #666; font-size: 12px;">Gospel Grace Education</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Institute Seal -->
+                            <div style="text-align: center; flex: 1;">
+                                <div style="position: relative; height: 70mm; margin: 5mm auto 10mm auto;">
+                                    <div style="position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 70mm; height: 70mm; border: 2mm solid #d4af37; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: white;">
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 12px; color: #666; font-weight: bold;">SEAL</div>
+                                            <div style="font-size: 10px; color: #666;">GOSPEL GRACE</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <strong style="font-size: 16px; color: #1e3c72; display: block;">Authorized Signature</strong>
+                                <span style="color: #666; font-size: 14px;">Institute Stamp</span><br>
+                                <span style="color: #666; font-size: 12px;">Official Verification</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div style="text-align: center; margin-top: 15mm; color: #666; font-size: 10px; padding-top: 10mm; border-top: 1px solid #ddd;">
+                            <p><strong>Certificate ID:</strong> <span id="previewCertId" style="color: #1e3c72; font-weight: bold;">${data.certId}</span></p>
+                            <p style="margin-top: 2mm; color: #888;">
+                                This certificate is issued electronically and can be verified at Gospel Grace Education
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('certificatePreview').innerHTML = certificateHTML;
+        }
+        
+        // Authentication Functions
+        function showLogin() {
+            document.getElementById('loginModal').style.display = 'block';
+        }
+        
+        function hideLogin() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('loginMessage').style.display = 'none';
+        }
+        
+        // FIXED: Login using localStorage
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                showMessage('loginMessage', 'Please enter username and password', 'error');
+                return;
+            }
+            
+            try {
+                showMessage('loginMessage', 'Logging in...', 'info');
+                
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const result = await response.json();
+                
+                if(result.success) {
+                    // Store user data in localStorage
+                    localStorage.setItem('currentUser', JSON.stringify(result.user));
+                    localStorage.setItem('isLoggedIn', 'true');
+                    
+                    currentUser = result.user;
+                    document.getElementById('loginSection').style.display = 'none';
+                    document.getElementById('userInfo').style.display = 'block';
+                    document.getElementById('userName').textContent = currentUser.full_name || currentUser.username;
+                    hideLogin();
+                    
+                    // Show UI elements
+                    document.getElementById('navTabs').style.display = 'flex';
+                    document.getElementById('mainSearchBar').style.display = 'flex';
+                    
+                    // Update UI based on role
+                    updateUIForRole(currentUser.role);
+                    
+                    // Load initial data
+                    loadDashboard();
+                    loadStudents();
+                    loadFAQ();
+                    
+                    showMessage('dashboardMessage', `Welcome ${currentUser.full_name}!`, 'success');
+                } else {
+                    showMessage('loginMessage', `Error: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('loginMessage', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // FIXED: Logout using localStorage
+        async function logout() {
+            try {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            
+            // Clear localStorage
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isLoggedIn');
+            
+            currentUser = null;
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'none';
+            
+            // Hide UI elements
+            document.getElementById('navTabs').style.display = 'none';
+            document.getElementById('mainSearchBar').style.display = 'none';
+            
+            // Clear all data displays
+            document.getElementById('recentStudents').innerHTML = '<p>Please login to view students</p>';
+            document.getElementById('studentList').innerHTML = '<p>Please login to view students</p>';
+            document.getElementById('studentStats').innerHTML = '<p>Please login to view reports</p>';
+            document.getElementById('attendanceStats').innerHTML = '<p>Please login to view attendance</p>';
+            
+            // Show login modal
+            showLogin();
+        }
+        
+        // FIXED: Check authentication from localStorage
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const storedUser = localStorage.getItem('currentUser');
+            
+            if (isLoggedIn === 'true' && storedUser) {
+                currentUser = JSON.parse(storedUser);
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('userName').textContent = currentUser.full_name || currentUser.username;
+                
+                // Show UI elements
+                document.getElementById('navTabs').style.display = 'flex';
+                document.getElementById('mainSearchBar').style.display = 'flex';
+                
+                updateUIForRole(currentUser.role);
+                
+                // Load initial data
+                loadDashboard();
+                loadStudents();
+                loadFAQ();
+            } else {
+                // Not logged in, show login modal
+                setTimeout(showLogin, 1000);
+            }
+        }
+        
+        function updateUIForRole(role) {
+            const attendanceTab = document.getElementById('attendanceTab');
+            const feesTab = document.getElementById('feesTab');
+            const certificateTab = document.getElementById('certificateTab');
+            const addStudentCard = document.getElementById('addStudentCard');
+            const addStudentBtn = document.getElementById('addStudentBtn');
+            const recordFeeBtn = document.getElementById('recordFeeBtn');
+            const markAttendanceBtn = document.getElementById('markAttendanceBtn');
+            const generateCertBtn = document.getElementById('generateCertBtn');
+            
+            if (role === 'teacher') {
+                attendanceTab.classList.remove('hidden');
+                feesTab.classList.add('hidden');
+                certificateTab.classList.add('hidden');
+                
+                addStudentCard.style.display = 'none';
+                addStudentBtn.style.display = 'none';
+                recordFeeBtn.style.display = 'none';
+                generateCertBtn.style.display = 'none';
+                markAttendanceBtn.style.display = 'block';
+            } else if (role === 'admin') {
+                attendanceTab.classList.remove('hidden');
+                feesTab.classList.remove('hidden');
+                certificateTab.classList.remove('hidden');
+                
+                addStudentCard.style.display = 'block';
+                addStudentBtn.style.display = 'block';
+                recordFeeBtn.style.display = 'block';
+                generateCertBtn.style.display = 'block';
+                markAttendanceBtn.style.display = 'block';
+            }
+            
+            updateButtonStates();
+        }
+        
+        function updateButtonStates() {
+            if (!currentUser) return;
+            
+            const addStudentBtn = document.getElementById('addStudentBtn');
+            const recordFeeBtn = document.getElementById('recordFeeBtn');
+            const generateCertBtn = document.getElementById('generateCertBtn');
+            
+            if (currentUser.role === 'teacher') {
+                addStudentBtn.disabled = true;
+                recordFeeBtn.disabled = true;
+                generateCertBtn.disabled = true;
+                addStudentBtn.style.opacity = '0.5';
+                recordFeeBtn.style.opacity = '0.5';
+                generateCertBtn.style.opacity = '0.5';
+            } else {
+                addStudentBtn.disabled = false;
+                recordFeeBtn.disabled = false;
+                generateCertBtn.disabled = false;
+                addStudentBtn.style.opacity = '1';
+                recordFeeBtn.style.opacity = '1';
+                generateCertBtn.style.opacity = '1';
+            }
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+            
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const tabElement = document.getElementById(tabName);
+            if (tabElement) {
+                tabElement.classList.add('active');
+                
+                // Load data for the tab
+                if(tabName === 'dashboard') {
+                    loadDashboard();
+                } else if(tabName === 'student') {
+                    loadStudents();
+                } else if(tabName === 'attendance') {
+                    loadAttendanceStudents();
+                } else if(tabName === 'reports') {
+                    loadReports();
+                }
+            }
+            
+            // Update tab navigation
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.textContent.includes(tabName.charAt(0).toUpperCase() + tabName.slice(1))) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+        
+        // Show message
+        function showMessage(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `message ${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Load dashboard data
+        async function loadDashboard() {
+            if (!currentUser) return;
+            
+            try {
+                let response;
+                if (currentUser.role === 'admin') {
+                    response = await fetch(`${API_BASE}/admin/dashboard/stats`);
+                } else if (currentUser.role === 'teacher') {
+                    response = await fetch(`${API_BASE}/teacher/dashboard/stats`);
+                }
+                
+                if (response) {
+                    const result = await response.json();
+                    if (result.success && currentUser.role === 'admin') {
+                        // Display admin stats
+                        let statsHtml = '<div class="grid" style="margin-top: 20px;">';
+                        statsHtml += `<div class="card"><h4>Total Students</h4><h2>${result.stats?.students || 0}</h2></div>`;
+                        statsHtml += `<div class="card"><h4>Total Teachers</h4><h2>${result.stats?.teachers || 0}</h2></div>`;
+                        statsHtml += `<div class="card"><h4>Total Courses</h4><h2>${result.stats?.courses || 0}</h2></div>`;
+                        statsHtml += '</div>';
+                        document.getElementById('dashboardMessage').innerHTML = statsHtml;
+                        document.getElementById('dashboardMessage').style.display = 'block';
+                    }
+                }
+                
+                // Load recent students
+                if (currentUser.role === 'admin') {
+                    const studentsResponse = await fetch(`${API_BASE}/admin/students`);
+                    const studentsResult = await studentsResponse.json();
+                    
+                    if (studentsResult.success) {
+                        const recentStudents = studentsResult.students.slice(-5).reverse();
+                        const html = recentStudents.map(student => `
+                            <div class="student-item">
+                                <div>
+                                    <strong>${student.full_name}</strong><br>
+                                    <small>${student.course}</small>
+                                </div>
+                                <div>
+                                    <small>${student.email}</small><br>
+                                    <small>${student.phone}</small>
+                                </div>
+                            </div>
+                        `).join('');
+                        
+                        document.getElementById('recentStudents').innerHTML = html || '<p>No students found</p>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+        
+        // Load all students
+        async function loadStudents() {
+            if (!currentUser) return;
+            
+            try {
+                let response;
+                if (currentUser.role === 'admin') {
+                    response = await fetch(`${API_BASE}/admin/students`);
+                } else if (currentUser.role === 'teacher') {
+                    response = await fetch(`${API_BASE}/teacher/students`);
+                }
+                
+                if (response) {
+                    const result = await response.json();
+                    if (result.success) {
+                        allStudents = result.students;
+                        displayStudents(allStudents);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showMessage('studentMessage', 'Error loading students', 'error');
+            }
+        }
+        
+        function displayStudents(students) {
+            const html = students.map(student => `
+                <div class="student-item">
+                    <div>
+                        <strong>${student.full_name}</strong><br>
+                        <small>${student.course}</small><br>
+                        <small>${student.email} | ${student.phone}</small>
+                    </div>
+                    <div class="action-buttons">
+                        <button onclick="viewStudentDetails('${student._id}')" class="action-btn btn">
+                            View
+                        </button>
+                        ${currentUser && currentUser.role === 'admin' ? `
+                        <button onclick="deleteStudent('${student._id}')" class="action-btn btn-danger">
+                            Delete
+                        </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('studentList').innerHTML = html || '<p>No students found</p>';
+        }
+        
+        // Add new student
+        async function addStudent(event) {
+            event.preventDefault();
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Only admin can add students');
+                return;
+            }
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/students/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if(result.success) {
+                    showMessage('studentMessage', `Student added successfully! Student ID: ${result.student_id}`, 'success');
+                    form.reset();
+                    loadStudents();
+                    loadDashboard();
+                } else {
+                    showMessage('studentMessage', `Error: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('studentMessage', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Delete student
+        async function deleteStudent(studentId) {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Only admin can delete students');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to delete this student?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/students/${studentId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if(result.success) {
+                    showMessage('studentMessage', 'Student deleted successfully!', 'success');
+                    loadStudents();
+                    loadDashboard();
+                } else {
+                    showMessage('studentMessage', `Error: ${result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('studentMessage', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // View student details
+        async function viewStudentDetails(studentId) {
+            try {
+                const response = await fetch(`${API_BASE}/admin/students`);
+                const result = await response.json();
+                if (result.success) {
+                    const student = result.students.find(s => s._id === studentId);
+                    if (student) {
+                        alert(`Student Details:\n\nName: ${student.full_name}\nEmail: ${student.email}\nPhone: ${student.phone}\nCourse: ${student.course}\nAddress: ${student.address || 'N/A'}\nFather: ${student.father_name || 'N/A'}\nMother: ${student.mother_name || 'N/A'}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error viewing student details:', error);
+            }
+        }
+        
+        // Generate certificate
+        function generateCertificate(event) {
+            event.preventDefault();
+            
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Only admin can generate certificates');
+                return;
+            }
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            const studentName = document.getElementById('certStudentName').value;
+            
+            if (!studentName) {
+                showMessage('certMessage', 'Please enter student name', 'error');
+                return;
+            }
+            
+            // Generate certificate ID
+            const certId = `CERT-${Date.now().toString().slice(-10)}`;
+            const completionDate = data.completion_date || new Date().toLocaleDateString();
+            const issueDate = new Date().toLocaleDateString();
+            const duration = data.duration || '3 Months';
+            const grade = data.grade + ' (' + (data.grade === 'A' ? 'Excellent' : data.grade === 'B' ? 'Very Good' : 'Good') + ')';
+            
+            // Update preview
+            renderCertificatePreview({
+                studentName: studentName.toUpperCase(),
+                courseName: data.course_name.toUpperCase(),
+                duration: duration,
+                grade: grade,
+                completionDate: completionDate,
+                certId: certId,
+                issueDate: issueDate
+            });
+            
+            showMessage('certMessage', `Certificate generated successfully! Certificate ID: ${certId}`, 'success');
+        }
+        
+        // Print certificate
+        function printCertificate() {
+            if (!currentUser || currentUser.role !== 'admin') {
+                alert('Only admin can print certificates');
+                return;
+            }
+            
+            const certificateHTML = document.getElementById('certificatePreview').innerHTML;
+            
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Certificate - Gospel Grace Education</title>
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 0;
+                        }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                            width: 210mm;
+                            height: 297mm;
+                            overflow: hidden;
+                            font-family: 'Times New Roman', serif;
+                        }
+                        .certificate-container {
+                            width: 210mm;
+                            height: 297mm;
+                            position: relative;
+                            background: white;
+                        }
+                        * {
+                            box-sizing: border-box;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="certificate-container">
+                        ${certificateHTML}
+                    </div>
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            setTimeout(function() {
+                                window.close();
+                            }, 500);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `;
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+        }
+        
+        // Load FAQ
+        function loadFAQ() {
+            const defaultFAQ = [
+                {
+                    question: 'How do I add a new student?',
+                    answer: 'Go to Students tab, fill in all required fields and click Register Student. Only admin can add students.'
+                },
+                {
+                    question: 'How can I search for a student?',
+                    answer: 'Use the search bar at the top of the page or the search box in the Students tab. You can search by Name, Email, or Phone.'
+                },
+                {
+                    question: 'What can teachers do?',
+                    answer: 'Teachers can view student lists, mark attendance, and view reports. Only admin can add/delete students and generate certificates.'
+                },
+                {
+                    question: 'How do I generate a certificate?',
+                    answer: 'Go to Certificate tab, enter student details and course information, then click Generate Certificate. You can then print it in A4 format.'
+                }
+            ];
+            document.getElementById('faqList').innerHTML = defaultFAQ.map((item, index) => `
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFAQ(${index})">
+                        <span>${item.question}</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="faq-answer" id="faqAnswer${index}">
+                        ${item.answer}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function toggleFAQ(index) {
+            const answer = document.getElementById(`faqAnswer${index}`);
+            answer.classList.toggle('active');
+        }
+        
+        // Load reports
+        async function loadReports() {
+            if (!currentUser) return;
+            
+            try {
+                let response;
+                if (currentUser.role === 'admin') {
+                    response = await fetch(`${API_BASE}/admin/dashboard/stats`);
+                } else if (currentUser.role === 'teacher') {
+                    response = await fetch(`${API_BASE}/teacher/dashboard/stats`);
+                }
+                
+                if (response) {
+                    const result = await response.json();
+                    if (result.success) {
+                        let statsHtml = '';
+                        if (currentUser.role === 'admin') {
+                            statsHtml = `
+                                <p><strong>Total Students:</strong> ${result.stats?.students || 0}</p>
+                                <p><strong>Total Teachers:</strong> ${result.stats?.teachers || 0}</p>
+                                <p><strong>Total Courses:</strong> ${result.stats?.courses || 0}</p>
+                                <p><strong>Recent Admissions:</strong> ${result.stats?.recentAdmissions || 0}</p>
+                            `;
+                        } else {
+                            statsHtml = `
+                                <p><strong>Assigned Students:</strong> ${result.stats?.assigned_students || 0}</p>
+                                <p><strong>Pending Tasks:</strong> ${result.stats?.pending_tasks || 0}</p>
+                                <p><strong>Completed Sessions:</strong> ${result.stats?.completed_sessions || 0}</p>
+                                <p><strong>Upcoming Classes:</strong> ${result.stats?.upcoming_classes || 0}</p>
+                            `;
+                        }
+                        document.getElementById('studentStats').innerHTML = statsHtml;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading reports:', error);
+            }
+        }
+        
+        // Attendance functions
+        async function loadAttendanceStudents() {
+            if (!currentUser) return;
+            
+            try {
+                let response;
+                if (currentUser.role === 'admin') {
+                    response = await fetch(`${API_BASE}/admin/students`);
+                } else if (currentUser.role === 'teacher') {
+                    response = await fetch(`${API_BASE}/teacher/students`);
+                }
+                
+                if (response) {
+                    const result = await response.json();
+                    if (result.success) {
+                        attendanceStudents = result.students;
+                        renderAttendanceGrid();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading attendance students:', error);
+            }
+        }
+        
+        function renderAttendanceGrid(filter = '') {
+            const filteredStudents = attendanceStudents.filter(student => 
+                student.full_name.toLowerCase().includes(filter.toLowerCase()) ||
+                student.course.toLowerCase().includes(filter.toLowerCase())
+            );
+            
+            const html = filteredStudents.map(student => `
+                <div class="attendance-item" data-student-id="${student._id}" onclick="toggleAttendance(this, '${student._id}')">
+                    <strong>${student.full_name}</strong><br>
+                    <small>${student.course}</small><br>
+                </div>
+            `).join('');
+            
+            document.getElementById('attendanceGrid').innerHTML = html || '<p>No students found</p>';
+        }
+        
+        function filterAttendanceStudents() {
+            const filter = document.getElementById('attendanceSearch').value;
+            renderAttendanceGrid(filter);
+        }
+        
+        function toggleAttendance(element, studentId) {
+            if (!currentUser) return;
+            
+            // Toggle between present and absent
+            if (element.classList.contains('present')) {
+                element.classList.remove('present');
+                element.classList.add('absent');
+                element.innerHTML += `<br><small class="status-absent">Absent</small>`;
+            } else if (element.classList.contains('absent')) {
+                element.classList.remove('absent');
+                element.querySelector('small.status-absent')?.remove();
+            } else {
+                element.classList.add('present');
+                element.innerHTML += `<br><small class="status-present">Present</small>`;
+            }
+        }
+        
+        async function saveAttendance() {
+            if (!currentUser) return;
+            
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) {
+                showMessage('attendanceMessage', 'Please select a date', 'error');
+                return;
+            }
+            
+            const attendanceItems = document.querySelectorAll('.attendance-item.present, .attendance-item.absent');
+            if (attendanceItems.length === 0) {
+                showMessage('attendanceMessage', 'No attendance marked', 'error');
+                return;
+            }
+            
+            showMessage('attendanceMessage', 'Attendance feature coming soon!', 'info');
+        }
+        
+        // Global search
+        async function performSearch() {
+            if (!currentUser) {
+                showLogin();
+                return;
+            }
+            
+            const searchTerm = document.getElementById('globalSearch').value.trim();
+            if (!searchTerm) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/students`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const students = result.students;
+                    const filtered = students.filter(student => 
+                        student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        student.phone.includes(searchTerm)
+                    );
+                    
+                    if (filtered.length === 0) {
+                        alert('No students found matching your search');
+                        return;
+                    }
+                    
+                    displayStudents(filtered);
+                    switchTab('student');
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                alert('Error performing search');
+            }
+        }
+        
+        function clearSearch() {
+            document.getElementById('globalSearch').value = '';
+            loadStudents();
+        }
+        
+        // Student search
+        async function searchStudents() {
+            const searchTerm = document.getElementById('studentSearch').value.trim();
+            if (!searchTerm) {
+                loadStudents();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/students`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    const students = result.students;
+                    const filtered = students.filter(student => 
+                        student.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        student.phone.includes(searchTerm)
+                    );
+                    
+                    displayStudents(filtered);
+                }
+            } catch (error) {
+                console.error('Search error:', error);
+                showMessage('studentMessage', 'Error searching students', 'error');
+            }
+        }
+        
+        function clearStudentSearch() {
+            document.getElementById('studentSearch').value = '';
+            loadStudents();
+        }
+        
+        // Fee search (placeholder)
+        async function searchFees() {
+            showMessage('feeMessage', 'Fee management feature coming soon!', 'info');
+        }
+        
+        function clearFeeSearch() {
+            document.getElementById('feeSearch').value = '';
+        }
+    </script>
+</body>
+</html>
