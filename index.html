@@ -1,814 +1,1150 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gospel Grace Education - Institute Management System</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .header .subtitle {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .user-section {
-            position: absolute;
-            right: 30px;
-            top: 30px;
-        }
-        
-        .search-bar {
-            background: #f8f9fa;
-            padding: 15px 30px;
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .search-bar input {
-            flex: 1;
-        }
-        
-        .nav-tabs {
-            display: flex;
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-        }
-        
-        .tab {
-            padding: 15px 30px;
-            cursor: pointer;
-            font-weight: 600;
-            color: #495057;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-        }
-        
-        .tab:hover {
-            background: #e9ecef;
-        }
-        
-        .tab.active {
-            color: #1e3c72;
-            border-bottom: 3px solid #1e3c72;
-            background: white;
-        }
-        
-        .tab.hidden {
-            display: none;
-        }
-        
-        .tab.disabled {
-            opacity: 0.5;
-            pointer-events: none;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-control:focus {
-            border-color: #1e3c72;
-            outline: none;
-        }
-        
-        .btn {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-        }
-        
-        .btn-info {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
-        }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border: 1px solid #dee2e6;
-        }
-        
-        .card h3 {
-            color: #1e3c72;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 10px;
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            display: none;
-        }
-        
-        .message.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .message.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        .message.info {
-            background: #d1ecf1;
-            color: #0c5460;
-            border: 1px solid #bee5eb;
-        }
-        
-        .status-paid {
-            color: #28a745;
-            font-weight: bold;
-        }
-        
-        .status-pending {
-            color: #dc3545;
-            font-weight: bold;
-        }
-        
-        .status-partial {
-            color: #ffc107;
-            font-weight: bold;
-        }
-        
-        .status-present {
-            color: #28a745;
-            font-weight: bold;
-        }
-        
-        .status-absent {
-            color: #dc3545;
-            font-weight: bold;
-        }
-        
-        .student-list {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        
-        .student-item {
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .student-item:hover {
-            background: #f8f9fa;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .action-btn {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            min-width: 80px;
-        }
-        
-        .attendance-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .attendance-item {
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .attendance-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .attendance-item.present {
-            background: #d4edda;
-            border-color: #c3e6cb;
-        }
-        
-        .attendance-item.absent {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-        }
-        
-        .attendance-item.selected {
-            border: 2px solid #1e3c72;
-        }
-        
-        .faq-section {
-            margin-top: 20px;
-        }
-        
-        .faq-item {
-            margin-bottom: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .faq-question {
-            padding: 15px;
-            background: #f8f9fa;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .faq-answer {
-            padding: 15px;
-            background: white;
-            display: none;
-        }
-        
-        .faq-answer.active {
-            display: block;
-        }
-        
-        .help-section {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-        
-        /* Certificate Styles for A4 */
-        .certificate-preview {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-            margin: 20px 0;
-            overflow: auto;
-            max-height: 600px;
-        }
-        
-        .certificate-content {
-            background: white;
-            font-family: 'Times New Roman', serif;
-            position: relative;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            border-radius: 5px;
-            width: 210mm;
-            height: 297mm;
-            margin: 0 auto;
-            transform: scale(0.7);
-            transform-origin: top center;
-        }
-        
-        .print-btn {
-            background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .print-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        /* Modal Styles */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-        }
-        
-        .modal-content {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            z-index: 1001;
-            min-width: 400px;
-            max-width: 90%;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-header h3 {
-            margin: 0;
-        }
-        
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #6c757d;
-        }
-        
-        .login-required {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .login-required h2 {
-            color: #1e3c72;
-            margin-bottom: 20px;
-        }
-        
-        /* A4 Print Styles */
-        @page {
-            size: A4;
-            margin: 0;
-        }
-        
-        @media print {
-            body * {
-                visibility: hidden;
+import firebase_admin
+from firebase_admin import credentials, firestore
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from datetime import datetime
+import json
+import uuid
+import os
+import logging
+from functools import wraps
+
+# Your Firebase service account credentials
+FIREBASE_CREDENTIALS = {
+    "type": "service_account",
+    "project_id": "gospelgraceedu-fa030",
+    "private_key_id": "0f331bb454d608e2378a1f66ae5f35bbdec5b8f9",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCP5AVfN5zsrZd8\nBcyrPKnK0Pc/QigGU7L1cZD5+z5lVXsoA/04mvLSKRBcFe+TRUFwYfE723iZigzZ\nxZlV7IND8cbgQ0k9V5teRhFfb5Mv31T8CftL1dqY2OdJkv+UJqFbtfxM1OowiVpZ\n+l/O4Ugxe+4p6JlzryfYeXVJLKZhUtA5Fcg+pHw1MPtDXl24/yEKJQAx9i0e/jf7\n2EyRYdt1aItq4gJ+/DxuhDBwbNij59RgwJnlSepzNKMjkDCV6EskDxv+ilcOREMY\n31j11wEnjsT9DdIAHVsVdnp+fe5wzKc+qYiWWLrxaIKzNWdiIz0sMwVmXqFSR7pf\nObceXUAlAgMBAAECggEACylBP2sFaZhnfS/H+epZM0m1O/tqNl9srLwz5igWZW7V\ngDua+zaNqj6ULchnznEbS9fVCfMSrjo2l/fLVo5jejQ5XHDrr+3pN81QkKoLbTWy\nFmDB1NaQP7Xnbt4PpBLBBmed2+nSBpTI5NzWbKot2uTFiwunR4FpIlH9hoEHoNnZ\nU0qGDpioUgYwNOpSL4u827KxBunprN69xKlxL34DFDUMQRy/o86uJP3mYQvN/tCb\neTwynVEjdYJOzRREPa5oR23etDgMezUhyRQOwrcw9LXXtrjio0KinnUtWEyZHHJa\nryXAcQId6mSWLJwpEsdSGr1RCxzVId4Vy5m4SeXeKwKBgQDErMkSIH6zOHCutDKO\nTBWy2lmbmDKQhkHTMHUgEAFGnr4+WZNyOX7U0kGS9GM0CK+QgWTBzoEMaPvQ8Fq9\npf6LMi8E206zAEINy3kPUVJ2om5KH81ZL+2N48KGMzUICzPV98VfoQ/Lrtk10QZU\nAlYWBnLz4c4xJV0AZ5sB5P0GWwKBgQC7Sz5Q/ae9n0jPia48KEBN9c25LFy5SXmc\nWGg+G/G81nUZQ+rj8KtPM+oD14fdocLjkZ7678tFSyvwUgZsN4Qgl4yJwBA4prdz\nW/YSG6to3ChKFpsTJ//D34CMNAWTE1zIcFcGP2kRRupr64I1i760raxWsII5gCyw\nQ4kPIlqbfwKBgBtUc2B8eX7IIgh06+2QLxe6dedEQAqLTYxeWHhLIRJCLueVJQMj\ncDd8vDYCleJ+Ln9jK7Au1Qn3cL65F7Lw5S1MnPIM06PWLleiZcE2KMJpke/k+XEi\nUt17v+VMKltiyyI5mwjN5dcFBhQPZtS3umS3IrQ3NaLosULEIushefOvAoGAWNU7\nXVax9LJT6nu29DlzJobraGSuJgO/dnRIHQ1L/vEI4U7hXfOMjShmWiQkAO70bNNo\nwERz+Q3KbVW6TiGWvY6jzcIW74fDgyee8r/E8Rta0KkgLFnQaarcYaNa8YNBgqAl\n5oS05Mjp7v3o6FS7wx6MmyFk4rj0eTXPECqPJykCgYEAwzH++DCA1IIn+zwcVWLk\nt02P5CNdyuYRS567sxF2RPOOxDFvwZXgudOFVPLAv6NSmSnxpQ6qJYRQFRk6nqJg\nz8yiqgjinyePdzYZI85/jKRCjmDmtDiifQCedP9n6sFtaFw3Th/6l1RNKPMUdY8C\nNe1L7Rm8b4aQi9rjYfjkXcM=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-fbsvc@gospelgraceedu-fa030.iam.gserviceaccount.com",
+    "client_id": "103511348809809578355",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40gospelgraceedu-fa030.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+}
+
+# Initialize Firebase with your credentials
+try:
+    cred = credentials.Certificate(FIREBASE_CREDENTIALS)
+    firebase_admin.initialize_app(cred)
+    logging.info("Firebase initialized successfully with project: gospelgraceedu-fa030")
+except Exception as e:
+    logging.error(f"Failed to initialize Firebase: {e}")
+    # Try to initialize with default credentials as fallback
+    try:
+        firebase_admin.initialize_app()
+        logging.info("Firebase initialized with default credentials")
+    except:
+        logging.error("Could not initialize Firebase at all")
+
+db = firestore.client()
+
+app = Flask(__name__)
+CORS(app, origins=['*'], supports_credentials=True)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class FirestoreHelper:
+    def __init__(self):
+        self.db = db
+    
+    # Student Management
+    def add_student(self, student_data):
+        """Add a new student to Firestore"""
+        try:
+            student_id = f"STU{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}"
+            doc_ref = db.collection('students').document()
+            
+            student_data['student_id'] = student_id
+            student_data['firestore_id'] = doc_ref.id
+            student_data['created_at'] = firestore.SERVER_TIMESTAMP
+            student_data['updated_at'] = firestore.SERVER_TIMESTAMP
+            
+            doc_ref.set(student_data)
+            return doc_ref.id
+        except Exception as e:
+            logger.error(f"Error adding student: {e}")
+            return None
+    
+    def get_all_students(self):
+        """Get all students"""
+        try:
+            students = []
+            docs = db.collection('students').order_by('created_at', direction=firestore.Query.DESCENDING).stream()
+            
+            for doc in docs:
+                student = doc.to_dict()
+                student['_id'] = doc.id
+                
+                # Calculate fee balance
+                fees = self.get_fees_by_student(doc.id)
+                total_paid = sum(float(f.get('amount', 0)) for f in fees if f.get('status') == 'Paid')
+                student['total_paid'] = total_paid
+                student['balance'] = float(student.get('course_fees', 0)) - total_paid
+                
+                students.append(student)
+            return students
+        except Exception as e:
+            logger.error(f"Error getting students: {e}")
+            return []
+    
+    def get_student_by_id(self, student_id):
+        """Get a student by ID"""
+        try:
+            # Try by firestore_id
+            doc_ref = db.collection('students').document(student_id)
+            doc = doc_ref.get()
+            
+            if doc.exists:
+                student = doc.to_dict()
+                student['_id'] = doc.id
+                
+                # Get fee information
+                fees = self.get_fees_by_student(doc.id)
+                student['fees'] = fees
+                
+                # Get attendance information
+                attendance = self.get_attendance_by_student(doc.id)
+                student['attendance_summary'] = {
+                    'total_days': len(attendance),
+                    'present_days': sum(1 for a in attendance if a.get('status') == 'Present'),
+                    'absent_days': sum(1 for a in attendance if a.get('status') == 'Absent')
+                }
+                
+                return student
+            
+            # Try by student_id field
+            query = db.collection('students').where('student_id', '==', student_id).limit(1)
+            docs = query.stream()
+            
+            for doc in docs:
+                student = doc.to_dict()
+                student['_id'] = doc.id
+                
+                fees = self.get_fees_by_student(doc.id)
+                student['fees'] = fees
+                
+                attendance = self.get_attendance_by_student(doc.id)
+                student['attendance_summary'] = {
+                    'total_days': len(attendance),
+                    'present_days': sum(1 for a in attendance if a.get('status') == 'Present'),
+                    'absent_days': sum(1 for a in attendance if a.get('status') == 'Absent')
+                }
+                
+                return student
+            
+            return None
+        except Exception as e:
+            logger.error(f"Error getting student: {e}")
+            return None
+    
+    def search_students(self, search_term):
+        """Search students by name, phone, or course"""
+        try:
+            students = []
+            seen_ids = set()
+            
+            # Search in name
+            query = db.collection('students').where('name', '>=', search_term).where('name', '<=', search_term + '\uf8ff')
+            docs = query.stream()
+            for doc in docs:
+                if doc.id not in seen_ids:
+                    student = doc.to_dict()
+                    student['_id'] = doc.id
+                    students.append(student)
+                    seen_ids.add(doc.id)
+            
+            # Search in phone
+            query = db.collection('students').where('phone', '>=', search_term).where('phone', '<=', search_term + '\uf8ff')
+            docs = query.stream()
+            for doc in docs:
+                if doc.id not in seen_ids:
+                    student = doc.to_dict()
+                    student['_id'] = doc.id
+                    students.append(student)
+                    seen_ids.add(doc.id)
+            
+            # Search in course
+            query = db.collection('students').where('course', '>=', search_term).where('course', '<=', search_term + '\uf8ff')
+            docs = query.stream()
+            for doc in docs:
+                if doc.id not in seen_ids:
+                    student = doc.to_dict()
+                    student['_id'] = doc.id
+                    students.append(student)
+                    seen_ids.add(doc.id)
+            
+            # Search in student_id
+            query = db.collection('students').where('student_id', '>=', search_term).where('student_id', '<=', search_term + '\uf8ff')
+            docs = query.stream()
+            for doc in docs:
+                if doc.id not in seen_ids:
+                    student = doc.to_dict()
+                    student['_id'] = doc.id
+                    students.append(student)
+                    seen_ids.add(doc.id)
+            
+            return students
+        except Exception as e:
+            logger.error(f"Error searching students: {e}")
+            return []
+    
+    # Fee Management
+    def record_fee(self, fee_data):
+        """Record a fee payment"""
+        try:
+            doc_ref = db.collection('fees').document()
+            
+            fee_data['receipt_number'] = f"REC{datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}"
+            fee_data['payment_date'] = firestore.SERVER_TIMESTAMP
+            fee_data['created_at'] = firestore.SERVER_TIMESTAMP
+            
+            doc_ref.set(fee_data)
+            return doc_ref.id
+        except Exception as e:
+            logger.error(f"Error recording fee: {e}")
+            return None
+    
+    def get_fees_by_student(self, student_id):
+        """Get all fee records for a student"""
+        try:
+            fees = []
+            query = db.collection('fees').where('student_id', '==', student_id).stream()
+            
+            for doc in query:
+                fee = doc.to_dict()
+                fee['_id'] = doc.id
+                
+                if 'payment_date' in fee and hasattr(fee['payment_date'], 'strftime'):
+                    fee['payment_date'] = fee['payment_date'].strftime('%Y-%m-%d')
+                
+                fees.append(fee)
+            
+            # Sort by payment date descending
+            fees.sort(key=lambda x: x.get('payment_date', ''), reverse=True)
+            return fees
+        except Exception as e:
+            logger.error(f"Error getting fees: {e}")
+            return []
+    
+    def get_all_fees(self):
+        """Get all fee records"""
+        try:
+            fees = []
+            docs = db.collection('fees').stream()
+            
+            for doc in docs:
+                fee = doc.to_dict()
+                fee['_id'] = doc.id
+                
+                if 'payment_date' in fee and hasattr(fee['payment_date'], 'strftime'):
+                    fee['payment_date'] = fee['payment_date'].strftime('%Y-%m-%d')
+                
+                fees.append(fee)
+            
+            # Sort by payment date descending
+            fees.sort(key=lambda x: x.get('payment_date', ''), reverse=True)
+            return fees
+        except Exception as e:
+            logger.error(f"Error getting all fees: {e}")
+            return []
+    
+    def get_fee_summary(self, student_id):
+        """Get fee summary for a student"""
+        try:
+            fees = self.get_fees_by_student(student_id)
+            
+            summary = {
+                'total_amount': sum(float(f.get('amount', 0)) for f in fees),
+                'paid_amount': sum(float(f.get('amount', 0)) for f in fees if f.get('status') == 'Paid'),
+                'pending_amount': sum(float(f.get('amount', 0)) for f in fees if f.get('status') == 'Pending'),
+                'total_records': len(fees),
+                'recent_payments': fees[:5]
+            }
+            
+            return summary
+        except Exception as e:
+            logger.error(f"Error getting fee summary: {e}")
+            return None
+    
+    # Attendance Management
+    def record_attendance(self, attendance_data):
+        """Record student attendance"""
+        try:
+            # Check if attendance already exists
+            query = db.collection('attendance').where('student_id', '==', attendance_data['student_id'])\
+                .where('date', '==', attendance_data['date']).limit(1)
+            docs = list(query.stream())
+            
+            if docs:
+                # Update existing record
+                docs[0].reference.update({
+                    'status': attendance_data['status'],
+                    'recorded_at': firestore.SERVER_TIMESTAMP,
+                    'recorded_by': attendance_data.get('recorded_by'),
+                    'updated_at': firestore.SERVER_TIMESTAMP
+                })
+                return True
+            else:
+                # Insert new record
+                doc_ref = db.collection('attendance').document()
+                attendance_data['recorded_at'] = firestore.SERVER_TIMESTAMP
+                attendance_data['created_at'] = firestore.SERVER_TIMESTAMP
+                doc_ref.set(attendance_data)
+                return doc_ref.id
+        except Exception as e:
+            logger.error(f"Error recording attendance: {e}")
+            return None
+    
+    def get_attendance_by_student(self, student_id):
+        """Get attendance records for a student"""
+        try:
+            attendance = []
+            query = db.collection('attendance').where('student_id', '==', student_id).stream()
+            
+            for doc in query:
+                record = doc.to_dict()
+                record['_id'] = doc.id
+                attendance.append(record)
+            
+            # Sort by date descending
+            attendance.sort(key=lambda x: x.get('date', ''), reverse=True)
+            return attendance
+        except Exception as e:
+            logger.error(f"Error getting attendance: {e}")
+            return []
+    
+    def get_attendance_by_date(self, date):
+        """Get attendance records for a specific date"""
+        try:
+            attendance = []
+            query = db.collection('attendance').where('date', '==', date).stream()
+            
+            for doc in query:
+                record = doc.to_dict()
+                record['_id'] = doc.id
+                attendance.append(record)
+            return attendance
+        except Exception as e:
+            logger.error(f"Error getting attendance by date: {e}")
+            return []
+    
+    def get_attendance_by_date_range(self, start_date, end_date):
+        """Get attendance records for a date range"""
+        try:
+            attendance = []
+            query = db.collection('attendance')\
+                .where('date', '>=', start_date)\
+                .where('date', '<=', end_date)\
+                .stream()
+            
+            for doc in query:
+                record = doc.to_dict()
+                record['_id'] = doc.id
+                attendance.append(record)
+            
+            # Sort by date descending
+            attendance.sort(key=lambda x: x.get('date', ''), reverse=True)
+            return attendance
+        except Exception as e:
+            logger.error(f"Error getting attendance by range: {e}")
+            return []
+    
+    # User Management
+    def authenticate_user(self, username, password):
+        """Authenticate user"""
+        try:
+            # Find user by username
+            query = db.collection('users').where('username', '==', username).limit(1)
+            docs = list(query.stream())
+            
+            if docs:
+                user_data = docs[0].to_dict()
+                user_data['_id'] = docs[0].id
+                
+                # Simple password check
+                if user_data.get('password') == password and user_data.get('is_active', False):
+                    # Remove password before returning
+                    user_data.pop('password', None)
+                    return user_data
+            
+            return None
+        except Exception as e:
+            logger.error(f"Error authenticating user: {e}")
+            return None
+    
+    def get_user_by_id(self, user_id):
+        """Get user by ID"""
+        try:
+            # Try by document ID
+            doc_ref = db.collection('users').document(user_id)
+            doc = doc_ref.get()
+            
+            if doc.exists:
+                user = doc.to_dict()
+                user['_id'] = doc.id
+                user.pop('password', None)
+                return user
+            
+            # Try by username
+            query = db.collection('users').where('username', '==', user_id).limit(1)
+            docs = list(query.stream())
+            
+            if docs:
+                user = docs[0].to_dict()
+                user['_id'] = docs[0].id
+                user.pop('password', None)
+                return user
+            
+            return None
+        except Exception as e:
+            logger.error(f"Error getting user: {e}")
+            return None
+    
+    def create_user(self, user_data):
+        """Create a new user"""
+        try:
+            # Check if username already exists
+            query = db.collection('users').where('username', '==', user_data['username']).limit(1)
+            if list(query.stream()):
+                return None
+            
+            doc_ref = db.collection('users').document()
+            user_data['created_at'] = firestore.SERVER_TIMESTAMP
+            user_data['is_active'] = True
+            
+            doc_ref.set(user_data)
+            return doc_ref.id
+        except Exception as e:
+            logger.error(f"Error creating user: {e}")
+            return None
+    
+    # Reports
+    def get_student_stats(self):
+        """Get student statistics"""
+        try:
+            # Get all students
+            students = self.get_all_students()
+            total_students = len(students)
+            
+            # Course distribution
+            course_distribution = {}
+            for student in students:
+                course = student.get('course', 'Unknown')
+                course_distribution[course] = course_distribution.get(course, 0) + 1
+            
+            # Today's attendance
+            today = datetime.now().strftime('%Y-%m-%d')
+            today_attendance = self.get_attendance_by_date(today)
+            present_today = sum(1 for r in today_attendance if r.get('status') == 'Present')
+            absent_today = sum(1 for r in today_attendance if r.get('status') == 'Absent')
+            
+            # Fee statistics
+            all_fees = self.get_all_fees()
+            fee_stats = {'Paid': 0, 'Pending': 0}
+            for fee in all_fees:
+                status = fee.get('status', 'Pending')
+                amount = float(fee.get('amount', 0))
+                if status in fee_stats:
+                    fee_stats[status] += amount
+            
+            return {
+                'total_students': total_students,
+                'course_distribution': [{'course': k, 'count': v} for k, v in course_distribution.items()],
+                'attendance_today': {
+                    'present': present_today,
+                    'absent': absent_today,
+                    'total': len(today_attendance),
+                    'percentage': round((present_today / len(today_attendance) * 100), 2) if today_attendance else 0
+                },
+                'fee_stats': [{'status': k, 'total_amount': v} for k, v in fee_stats.items()]
+            }
+        except Exception as e:
+            logger.error(f"Error getting student stats: {e}")
+            return {}
+
+# Initialize Firestore Helper
+db_helper = FirestoreHelper()
+
+# Simple authentication middleware for Render deployment
+def token_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        
+        # For demo purposes, accept any token
+        if not auth_header:
+            return jsonify({'error': 'Token required'}), 401
+        
+        # Extract token
+        parts = auth_header.split()
+        if len(parts) != 2 or parts[0].lower() != 'bearer':
+            return jsonify({'error': 'Invalid token format. Use: Bearer <token>'}), 401
+        
+        token = parts[1]
+        
+        # Simple token check
+        if not token:
+            return jsonify({'error': 'Invalid token'}), 401
+        
+        # For now, just accept the token
+        request.user_id = 'demo_user'
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+# Initialize default users
+def initialize_default_users():
+    """Create default users if they don't exist"""
+    try:
+        users_data = [
+            {
+                'username': 'admin',
+                'password': 'admin123',
+                'name': 'System Administrator',
+                'role': 'admin',
+                'email': 'admin@gospelgrace.edu',
+                'phone': '0000000000'
+            },
+            {
+                'username': 'founder',
+                'password': 'founder123',
+                'name': 'Mr. Amey Lole',
+                'role': 'founder',
+                'email': 'amey@gospelgrace.edu',
+                'phone': '8010132586'
+            },
+            {
+                'username': 'teacher',
+                'password': 'teacher123',
+                'name': 'Teacher Account',
+                'role': 'teacher',
+                'email': 'teacher@gospelgrace.edu',
+                'phone': '1111111111'
+            }
+        ]
+        
+        for user_data in users_data:
+            query = db.collection('users').where('username', '==', user_data['username']).limit(1)
+            if not list(query.stream()):
+                db_helper.create_user(user_data)
+                logger.info(f"{user_data['username']} user created")
+        
+        logger.info("Default users initialized successfully")
+    except Exception as e:
+        logger.error(f"Error initializing users: {e}")
+
+# Initialize users
+initialize_default_users()
+
+# Add this route after the Flask app is created
+@app.route('/index.html')
+def serve_frontend():
+    # Return the HTML content directly
+    return '''
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Gospel Grace Education</title>
+        <style>
+            /* Add basic styles */
+            body {
+                font-family: Arial, sans-serif;
                 margin: 0;
-                padding: 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                text-align: center;
+            }
+            h1 {
+                color: #1e3c72;
+                margin-bottom: 30px;
+            }
+            .message {
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+            .success {
+                background: #d4edda;
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+            .error {
+                background: #f8d7da;
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Gospel Grace Education</h1>
+            <div id="message" class="message"></div>
+            <h3>Backend Status:</h3>
+            <p id="status">Checking...</p>
+            <button onclick="testAPI()" style="padding: 10px 20px; margin: 10px; background: #1e3c72; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Test API Connection
+            </button>
+        </div>
+        
+        <script>
+            async function testAPI() {
+                const message = document.getElementById('message');
+                const status = document.getElementById('status');
+                
+                try {
+                    message.textContent = 'Testing API connection...';
+                    message.className = 'message';
+                    
+                    const response = await fetch('/api/health');
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        message.textContent = '✅ API is working!';
+                        message.className = 'message success';
+                        status.innerHTML = `
+                            <strong>Status:</strong> ${data.status}<br>
+                            <strong>Service:</strong> ${data.service}<br>
+                            <strong>Database:</strong> ${data.database || 'Not connected'}
+                        `;
+                    } else {
+                        message.textContent = '❌ API Error: ' + (data.error || 'Unknown error');
+                        message.className = 'message error';
+                    }
+                } catch (error) {
+                    message.textContent = '❌ Cannot connect to API: ' + error.message;
+                    message.className = 'message error';
+                }
             }
             
-            .certificate-content, .certificate-content * {
-                visibility: visible;
-            }
-            
-            .certificate-content {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 210mm !important;
-                height: 297mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                border: none !important;
-                transform: none !important;
-                scale: 1 !important;
-            }
-            
-            .no-print {
-                display: none !important;
-            }
+            // Test on page load
+            window.onload = testAPI;
+        </script>
+    </body>
+    </html>
+    '''
+
+# Authentication Endpoints
+@app.route('/api/login', methods=['POST', 'OPTIONS'])
+def login():
+    """User login"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        data = request.json
+        if 'username' not in data or 'password' not in data:
+            return jsonify({'error': 'Username and password required'}), 400
+        
+        user = db_helper.authenticate_user(data['username'], data['password'])
+        if user:
+            return jsonify({
+                'message': 'Login successful',
+                'user': {
+                    'id': user['_id'],
+                    'username': user['username'],
+                    'name': user['name'],
+                    'role': user['role'],
+                    'email': user.get('email', ''),
+                    'phone': user.get('phone', '')
+                },
+                'token': 'demo_token_' + user['_id']
+            }), 200
+        
+        return jsonify({'error': 'Invalid username or password'}), 401
+    except Exception as e:
+        logger.error(f"Login error: {e}")
+        return jsonify({'error': 'Login failed'}), 500
+
+# Student Management Endpoints
+@app.route('/api/students', methods=['GET', 'OPTIONS'])
+@token_required
+def get_all_students():
+    """Get all students"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        students = db_helper.get_all_students()
+        return jsonify(students), 200
+    except Exception as e:
+        logger.error(f"Get students error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/students', methods=['POST', 'OPTIONS'])
+@token_required
+def add_student():
+    """Add a new student"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        data = request.json
+        required_fields = ['name', 'age', 'course', 'phone', 'course_fees', 'initial_payment']
+        
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # Create student record
+        student_data = {
+            'name': data['name'],
+            'age': int(data['age']),
+            'course': data['course'],
+            'phone': data['phone'],
+            'email': data.get('email', ''),
+            'address': data.get('address', ''),
+            'guardian_name': data.get('guardian_name', ''),
+            'guardian_phone': data.get('guardian_phone', ''),
+            'course_fees': float(data['course_fees']),
+            'enrollment_date': datetime.now().strftime('%Y-%m-%d'),
+            'created_by': request.user_id
         }
-    </style>
-</head>
-<body>
-    <!-- Login Modal -->
-    <div id="loginModal" class="modal-backdrop">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Login to Gospel Grace Education</h3>
-                <button class="close-btn" onclick="hideLogin()">&times;</button>
-            </div>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="loginUsername" class="form-control" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" class="form-control" placeholder="Enter password">
-            </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn" onclick="login()">Login</button>
-                <button class="btn btn-secondary" onclick="hideLogin()">Cancel</button>
-            </div>
-            <div id="loginMessage" class="message" style="margin-top: 15px;"></div>
-            
-            <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-                <p><strong>Test Accounts:</strong></p>
-                <p>Admin: admin / admin123</p>
-                <p>Teacher: teacher / teacher123</p>
-            </div>
-        </div>
-    </div>
+        
+        student_id = db_helper.add_student(student_data)
+        
+        # Create initial fee record
+        if float(data['initial_payment']) > 0:
+            fee_data = {
+                'student_id': student_id,
+                'amount': float(data['initial_payment']),
+                'status': 'Paid',
+                'payment_mode': data.get('payment_mode', 'Cash'),
+                'description': 'Initial Payment - Course Enrollment',
+                'recorded_by': request.user_id
+            }
+            db_helper.record_fee(fee_data)
+        
+        return jsonify({
+            'message': 'Student added successfully',
+            'student_id': student_id
+        }), 201
+    except Exception as e:
+        logger.error(f"Add student error: {e}")
+        return jsonify({'error': str(e)}), 500
 
-    <div class="container">
-        <div class="header">
-            <h1>✝ Gospel Grace Education</h1>
-            <p class="subtitle">Institute Management System - Spoken English & Computer Courses</p>
-            
-            <div class="user-section">
-                <div id="loginSection">
-                    <button class="btn" onclick="showLogin()">Login</button>
-                </div>
-                <div id="userInfo" style="display: none;">
-                    <span id="userName" style="color: white; margin-right: 10px; font-weight: bold;"></span>
-                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
-                </div>
-            </div>
-        </div>
-        
-        <div class="search-bar" id="mainSearchBar" style="display: none;">
-            <input type="text" id="globalSearch" class="form-control" placeholder="Search by Student ID, Name, Phone or Email...">
-            <button class="btn" onclick="performSearch()">🔍 Search</button>
-            <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
-        </div>
-        
-        <div class="nav-tabs" id="navTabs" style="display: none;">
-            <div class="tab active" onclick="switchTab('dashboard')">📊 Dashboard</div>
-            <div class="tab" onclick="switchTab('student')">👨‍🎓 Students</div>
-            <div class="tab hidden" onclick="switchTab('attendance')" id="attendanceTab">📝 Attendance</div>
-            <div class="tab hidden" onclick="switchTab('fees')" id="feesTab">💰 Fees</div>
-            <div class="tab hidden" onclick="switchTab('certificate')" id="certificateTab">📜 Certificate</div>
-            <div class="tab" onclick="switchTab('reports')">📈 Reports</div>
-        </div>
-        
-        <div class="content">
-            <!-- Dashboard Tab -->
-            <div id="dashboard" class="tab-content active">
-                <h2>📊 Institute Dashboard</h2>
-                <div class="message" id="dashboardMessage"></div>
-                
-                <div class="help-section">
-                    <h3>❓ Need Help?</h3>
-                    <p>Welcome to Gospel Grace Education Management System. Here are some quick tips:</p>
-                    <ul style="margin: 10px 0 10px 20px;">
-                        <li>Use the search bar to find students quickly</li>
-                        <li>Check the FAQ section below for common questions</li>
-                        <li>Contact support: gospelgraceeducation@gmail.com | +91 8010132586</li>
-                    </ul>
-                </div>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h3>Quick Actions</h3>
-                        <button class="btn" onclick="switchTab('student')" id="addStudentBtn">➕ Add New Student</button>
-                        <button class="btn btn-success" onclick="switchTab('fees')" id="recordFeeBtn">💰 Record Fee Payment</button>
-                        <button class="btn" onclick="switchTab('attendance')" id="markAttendanceBtn">📝 Mark Attendance</button>
-                        <button class="btn" onclick="switchTab('certificate')" id="generateCertBtn">📜 Generate Certificate</button>
-                        <button class="btn btn-secondary" onclick="loadReports()">📈 View Reports</button>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Institute Info</h3>
-                        <p><strong>Name:</strong> Gospel Grace Education</p>
-                        <p><strong>Courses:</strong> Spoken English, Computer Basics, Advanced Computing, Tuitions from (Pre-primary to 9(SSC/CBSC/ICSC)</p>
-                        <p><strong>FOUNDER:</strong> Mr. Amey Lole</p>
-                        <p><strong>Contact:</strong> gospelgraceeducation@gmail.com | +91 8010132586</p>
-                        <p><strong>Address:</strong> [Your Institute Address Here]</p>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Recent Students</h3>
-                        <div class="student-list" id="recentStudents">
-                            <p>Please login to view students</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- FAQ Section -->
-                <div class="faq-section">
-                    <h3>📋 Frequently Asked Questions</h3>
-                    <div id="faqList">
-                        <!-- FAQ will be loaded here -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Students Tab -->
-            <div id="student" class="tab-content">
-                <h2>👨‍🎓 Student Management</h2>
-                <div class="message" id="studentMessage"></div>
-                
-                <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="studentSearch" class="form-control" placeholder="Search students...">
-                    <button class="btn" onclick="searchStudents()">🔍 Search</button>
-                    <button class="btn btn-secondary" onclick="clearStudentSearch()">Clear</button>
-                </div>
-                
-                <div class="grid">
-                    <div class="card" id="addStudentCard">
-                        <h3>Register New Student</h3>
-                        <form id="studentForm" onsubmit="addStudent(event)">
-                            <div class="form-group">
-                                <label>Full Name *</label>
-                                <input type="text" class="form-control" name="full_name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Email *</label>
-                                <input type="email" class="form-control" name="email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Phone Number *</label>
-                                <input type="tel" class="form-control" name="phone" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Course *</label>
-                                <select class="form-control" name="course" required>
-                                    <option value="">Select Course</option>
-                                    <option value="Spoken English">Spoken English</option>
-                                    <option value="Computer Basics">Computer Basics</option>
-                                    <option value="Advanced Computing">Advanced Computing</option>
-                                    <option value="Tuitions (pre-primary)">Tuitions (pre-primary)</option>
-                                    <option value="Tuitions (primary)">Tuitions (primary)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Address</label>
-                                <textarea class="form-control" name="address" rows="2"></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Father's Name</label>
-                                <input type="text" class="form-control" name="father_name">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Mother's Name</label>
-                                <input type="text" class="form-control" name="mother_name">
-                            </div>
-                            
-                            <button type="submit" class="btn">Register Student</button>
-                        </form>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Student List</h3>
-                        <div class="student-list" id="studentList">
-                            <p>Please login to view students</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Attendance Tab -->
-            <div id="attendance" class="tab-content">
-                <h2>📝 Attendance Management</h2>
-                <div class="message" id="attendanceMessage"></div>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h3>Mark Attendance</h3>
-                        <div class="form-group">
-                            <label>Select Date *</label>
-                            <input type="date" id="attendanceDate" class="form-control" value="">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Search Student</label>
-                            <input type="text" id="attendanceSearch" class="form-control" placeholder="Search student..." onkeyup="filterAttendanceStudents()">
-                        </div>
-                        
-                        <div class="attendance-grid" id="attendanceGrid">
-                            <!-- Students will be loaded here -->
-                        </div>
-                        
-                        <div style="margin-top: 20px;">
-                            <button class="btn btn-success" onclick="saveAttendance()">💾 Save Attendance</button>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Today's Attendance</h3>
-                        <div class="student-list" id="todayAttendance">
-                            <!-- Today's attendance will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Fee Management Tab -->
-            <div id="fees" class="tab-content">
-                <h2>💰 Fee Management</h2>
-                <div class="message" id="feeMessage"></div>
-                
-                <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="feeSearch" class="form-control" placeholder="Search fees by student name, ID, or receipt number...">
-                    <button class="btn" onclick="searchFees()">🔍 Search Fees</button>
-                    <button class="btn btn-secondary" onclick="clearFeeSearch()">Clear</button>
-                </div>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h3>Fee Records</h3>
-                        <div class="student-list" id="feeRecords">
-                            <p>No fee records found</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Certificate Tab -->
-            <div id="certificate" class="tab-content">
-                <h2>📜 Certificate Generation</h2>
-                <div class="message" id="certMessage"></div>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h3>Generate Certificate</h3>
-                        <form id="certificateForm" onsubmit="generateCertificate(event)">
-                            <div class="form-group">
-                                <label>Student Name *</label>
-                                <input type="text" class="form-control" id="certStudentName" placeholder="Enter student name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Course Name *</label>
-                                <input type="text" class="form-control" name="course_name" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Duration</label>
-                                <input type="text" class="form-control" name="duration" value="3 Months">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Grade</label>
-                                <select class="form-control" name="grade">
-                                    <option value="A">A (Excellent)</option>
-                                    <option value="B">B (Very Good)</option>
-                                    <option value="C">C (Good)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Completion Date</label>
-                                <input type="date" class="form-control" name="completion_date">
-                            </div>
-                            
-                            <button type="submit" class="btn">Generate Certificate</button>
-                        </form>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Certificate Preview (A4 Size)</h3>
-                        <div class="certificate-preview">
-                            <div class="certificate-content" id="certificatePreview">
-                                <!-- Certificate Content (Will be generated by JavaScript) -->
-                            </div>
-                        </div>
-                        <button class="btn print-btn" onclick="printCertificate()" style="margin-top: 20px; width: 100%;">🖨️ Print Certificate (A4)</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Reports Tab -->
-            <div id="reports" class="tab-content">
-                <h2>📈 Reports & Analytics</h2>
-                
-                <div class="grid">
-                    <div class="card">
-                        <h3>Student Statistics</h3>
-                        <div id="studentStats">
-                            <p>Please login to view reports</p>
-                        </div>
-                    </div>
-                    
-                    <div class="card">
-                        <h3>Attendance Summary</h3>
-                        <div id="attendanceStats">
-                            <p>Please login to view attendance</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+@app.route('/api/students/<student_id>', methods=['GET', 'OPTIONS'])
+@token_required
+def get_student(student_id):
+    """Get a specific student"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        student = db_helper.get_student_by_id(student_id)
+        if student:
+            return jsonify(student), 200
+        return jsonify({'error': 'Student not found'}), 404
+    except Exception as e:
+        logger.error(f"Get student error: {e}")
+        return jsonify({'error': str(e)}), 500
 
-    <!-- Add this line to include your JavaScript file -->
-    <script src="app.js"></script>
-</body>
-</html>
+@app.route('/api/students/search/<search_term>', methods=['GET', 'OPTIONS'])
+@token_required
+def search_students(search_term):
+    """Search students"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        students = db_helper.search_students(search_term)
+        return jsonify(students), 200
+    except Exception as e:
+        logger.error(f"Search students error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Fee Management Endpoints
+@app.route('/api/fees', methods=['POST', 'OPTIONS'])
+@token_required
+def record_fee():
+    """Record a fee payment"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        data = request.json
+        required_fields = ['student_id', 'amount']
+        
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        fee_data = {
+            'student_id': data['student_id'],
+            'amount': float(data['amount']),
+            'status': data.get('status', 'Paid'),
+            'payment_mode': data.get('payment_mode', 'Cash'),
+            'description': data.get('description', 'Course Fee'),
+            'recorded_by': request.user_id
+        }
+        
+        fee_id = db_helper.record_fee(fee_data)
+        return jsonify({
+            'message': 'Fee recorded successfully',
+            'fee_id': fee_id
+        }), 201
+    except Exception as e:
+        logger.error(f"Record fee error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/fees/all', methods=['GET', 'OPTIONS'])
+@token_required
+def get_all_fees():
+    """Get all fee records"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        fees = db_helper.get_all_fees()
+        return jsonify(fees), 200
+    except Exception as e:
+        logger.error(f"Get all fees error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/fees/summary/<student_id>', methods=['GET', 'OPTIONS'])
+@token_required
+def get_fee_summary(student_id):
+    """Get fee summary for a student"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        summary = db_helper.get_fee_summary(student_id)
+        if summary:
+            return jsonify(summary), 200
+        return jsonify({'error': 'Student not found'}), 404
+    except Exception as e:
+        logger.error(f"Get fee summary error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Attendance Management Endpoints
+@app.route('/api/attendance', methods=['POST', 'OPTIONS'])
+@token_required
+def record_attendance():
+    """Record student attendance"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        data = request.json
+        required_fields = ['student_id', 'date', 'status']
+        
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        data['recorded_by'] = request.user_id
+        result = db_helper.record_attendance(data)
+        
+        if result:
+            return jsonify({'message': 'Attendance recorded successfully'}), 201
+        else:
+            return jsonify({'message': 'Attendance updated successfully'}), 200
+    except Exception as e:
+        logger.error(f"Record attendance error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/attendance/date/<date>', methods=['GET', 'OPTIONS'])
+@token_required
+def get_attendance_by_date(date):
+    """Get attendance records for a specific date"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        attendance = db_helper.get_attendance_by_date(date)
+        return jsonify(attendance), 200
+    except Exception as e:
+        logger.error(f"Get attendance by date error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/attendance/student/<student_id>', methods=['GET', 'OPTIONS'])
+@token_required
+def get_attendance_by_student(student_id):
+    """Get attendance records for a student"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        attendance = db_helper.get_attendance_by_student(student_id)
+        return jsonify(attendance), 200
+    except Exception as e:
+        logger.error(f"Get attendance by student error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Report Endpoints
+@app.route('/api/reports/students', methods=['GET', 'OPTIONS'])
+@token_required
+def student_report():
+    """Get student report"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        stats = db_helper.get_student_stats()
+        return jsonify(stats), 200
+    except Exception as e:
+        logger.error(f"Student report error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Mobile Dashboard
+@app.route('/api/mobile/dashboard', methods=['GET', 'OPTIONS'])
+@token_required
+def mobile_dashboard():
+    """Get dashboard data for mobile"""
+    if request.method == 'OPTIONS':
+        return '', 200
+    
+    try:
+        # Get counts
+        students_query = db.collection('students')
+        total_students = len(list(students_query.stream()))
+        
+        # Today's attendance
+        today = datetime.now().strftime('%Y-%m-%d')
+        today_attendance = db_helper.get_attendance_by_date(today)
+        present_today = sum(1 for r in today_attendance if r.get('status') == 'Present')
+        
+        # Fee statistics
+        all_fees = db_helper.get_all_fees()
+        total_fees = sum(float(f.get('amount', 0)) for f in all_fees)
+        pending_fees = sum(1 for f in all_fees if f.get('status') == 'Pending')
+        
+        # Recent students
+        recent_students = db_helper.get_all_students()[:5]
+        
+        return jsonify({
+            'stats': {
+                'total_students': total_students,
+                'present_today': present_today,
+                'total_fees': total_fees,
+                'pending_fees': pending_fees
+            },
+            'recent_students': recent_students
+        }), 200
+    except Exception as e:
+        logger.error(f"Mobile dashboard error: {e}")
+        return jsonify({'error': str(e)}), 500
+
+# Health check - FIXED VERSION
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """Health check endpoint"""
+    try:
+        # Don't test Firestore connection with actual write/delete
+        # Just check if we can access Firestore
+        collections = list(db.collections())
+        
+        return jsonify({
+            'status': 'healthy',
+            'service': 'Gospel Grace Education - Firebase',
+            'project': 'gospelgraceedu-fa030',
+            'timestamp': datetime.now().isoformat(),
+            'firebase': 'connected',
+            'database': 'firestore',
+            'collections': len(collections)
+        }), 200
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
+        return jsonify({
+            'status': 'unhealthy',
+            'error': 'Firestore API not enabled. Please enable it at: https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=gospelgraceedu-fa030'
+        }), 500
+
+@app.route('/')
+def home():
+    return '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Gospel Grace Education - Firebase Backend</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .container {
+                background: white;
+                padding: 40px;
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                text-align: center;
+                max-width: 800px;
+            }
+            h1 {
+                color: #1e3c72;
+                margin-bottom: 20px;
+            }
+            .status {
+                display: inline-block;
+                padding: 8px 16px;
+                margin: 10px;
+                border-radius: 20px;
+                font-weight: bold;
+            }
+            .online {
+                background: #d4edda;
+                color: #155724;
+            }
+            .offline {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            .endpoint {
+                text-align: left;
+                margin: 20px 0;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 5px;
+                border-left: 4px solid #007bff;
+            }
+            code {
+                background: #e9ecef;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-family: monospace;
+            }
+            button {
+                padding: 10px 20px;
+                margin: 10px;
+                background: #1e3c72;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Gospel Grace Education - Firebase Backend</h1>
+            <div id="statusDiv" class="status">Checking...</div>
+            <p><strong>Project:</strong> gospelgraceedu-fa030</p>
+            <p><strong>Database:</strong> 🔥 Firestore</p>
+            <p><strong>API Base URL:</strong> <code id="baseUrl">Loading...</code></p>
+            
+            <div id="apiStatus"></div>
+            
+            <button onclick="testAPI()">Test API Connection</button>
+            <button onclick="goToFrontend()">Go to Frontend</button>
+            
+            <div class="endpoint">
+                <h3>Quick Test Endpoints:</h3>
+                <p><strong>Health Check:</strong> <code>/api/health</code></p>
+                <p><strong>Login (POST):</strong> <code>/api/login</code></p>
+                <p><strong>Get Students:</strong> <code>/api/students</code></p>
+                <p><strong>Dashboard:</strong> <code>/api/mobile/dashboard</code></p>
+            </div>
+            
+            <div class="endpoint">
+                <h3>Default Login Credentials:</h3>
+                <p><strong>Admin:</strong> admin / admin123</p>
+                <p><strong>Founder:</strong> founder / founder123</p>
+                <p><strong>Teacher:</strong> teacher / teacher123</p>
+            </div>
+            
+            <div id="firestoreNote" style="background: #fff3cd; padding: 15px; border-radius: 5px; margin-top: 20px; display: none;">
+                <h4>⚠️ Firestore API Not Enabled</h4>
+                <p>Please enable Firestore API:</p>
+                <ol>
+                    <li>Go to: <a href="https://console.developers.google.com/apis/api/firestore.googleapis.com/overview?project=gospelgraceedu-fa030" target="_blank">Enable Firestore API</a></li>
+                    <li>Click "Enable"</li>
+                    <li>Wait 2-3 minutes</li>
+                    <li>Refresh this page</li>
+                </ol>
+            </div>
+        </div>
+        
+        <script>
+            // Set current URL
+            document.getElementById('baseUrl').textContent = window.location.origin;
+            
+            async function testAPI() {
+                const statusDiv = document.getElementById('statusDiv');
+                const apiStatus = document.getElementById('apiStatus');
+                const firestoreNote = document.getElementById('firestoreNote');
+                
+                try {
+                    statusDiv.textContent = 'Testing...';
+                    statusDiv.className = 'status';
+                    
+                    const response = await fetch('/api/health');
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        statusDiv.textContent = '✅ Online';
+                        statusDiv.className = 'status online';
+                        firestoreNote.style.display = 'none';
+                        
+                        apiStatus.innerHTML = `
+                            <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <h3>✅ API Working!</h3>
+                                <p><strong>Status:</strong> ${data.status}</p>
+                                <p><strong>Service:</strong> ${data.service}</p>
+                                <p><strong>Database:</strong> ${data.database || 'firestore'}</p>
+                                <p><strong>Collections:</strong> ${data.collections || 'N/A'}</p>
+                            </div>
+                        `;
+                    } else {
+                        statusDiv.textContent = '❌ Error';
+                        statusDiv.className = 'status offline';
+                        apiStatus.innerHTML = `
+                            <div style="background: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                                <h3>❌ API Error</h3>
+                                <p>${data.error || 'Unknown error'}</p>
+                            </div>
+                        `;
+                        
+                        if (data.error && data.error.includes('Firestore API')) {
+                            firestoreNote.style.display = 'block';
+                        }
+                    }
+                } catch (error) {
+                    statusDiv.textContent = '❌ Connection Failed';
+                    statusDiv.className = 'status offline';
+                    apiStatus.innerHTML = `
+                        <div style="background: #f8d7da; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <h3>❌ Cannot connect to API</h3>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+            }
+            
+            function goToFrontend() {
+                window.location.href = '/index.html';
+            }
+            
+            // Test on page load
+            window.onload = testAPI;
+        </script>
+    </body>
+    </html>
+    '''
+
+# For Render deployment
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
